@@ -1,0 +1,16 @@
+Package: ShinyAsyncTools
+Type: Package
+Title: Tools for message passing between async processes in shiny
+Version: 0.1.0
+Author: Ian Fellows
+Maintainer: Ian Fellows <ian@fellstat.com>
+Description: This package provides tools that let you update a shiny UI from within a child process (e.g. future). Examples are procided showing how to perform useful tasks such as: updating reactive values from within future, progress bars for long running async tasks, and inturrupting async tasks based on user input.
+Imports: R6, shiny, txtq
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
