@@ -53,6 +53,8 @@ TextFileSource <- R6Class(
 
     q = NULL,
 
+    destroyed = FALSE,
+
     initialize = function(filePath=tempFileGenerator()(), ...){
       self$file <- filePath
       self$q <- .TxTQ$new(self$file)#txtq::txtq(self$file)
@@ -61,7 +63,7 @@ TextFileSource <- R6Class(
     pop = function(n=-1){
       l <- self$q$pop(n)
       result <- list()
-      if(nrow(l) == 0)
+      if(self$destroyed || nrow(l) == 0)
         return(list())
       for(i in 1:nrow(l)){
         v <- l[i,2]
@@ -71,8 +73,36 @@ TextFileSource <- R6Class(
     },
 
     push = function(msg, obj){
+      if(self$destroyed)
+        stop("Cannot push to a destroyed TextFileSource")
       s <- objectToString(obj)
       self$q$push(msg, s)
+    },
+
+    destroy = function(){
+      if(!destroyed){
+        self$destroyed <- TRUE
+        self$q$destroy()
+      }
+    }
+  )
+)
+
+
+#' Reads and writes the queue to a text file and destroys it on session end
+#' @details
+#' A thin wrapper around \code{txtq}
+#' @export
+ShinyTextFileSource <- R6Class(
+  "ShinyTextFileSource",
+  inherit=TextFileSource,
+  public = list(
+    session = NULL,
+
+    initialize = function(filePath=tempFileGenerator()(),
+                          session=shiny::getDefaultReactiveDomain(),...){
+      session$onEnded(self$destroy)
+      super$initialize(filePath)
     }
   )
 )

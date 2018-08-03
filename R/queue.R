@@ -12,6 +12,13 @@ Queue <- R6Class(
       private$source <- source
       self$producer <- prod
       self$consumer <- cons
+    },
+    destroy = function(){
+      self$consumer$stop()
+      private$source$destroy()
+      private$source <- NULL
+      self$producer <- NULL
+      self$consumer <- NULL
     }
   )
 )
@@ -20,11 +27,9 @@ Queue <- R6Class(
 #' @param source The source for reading and writing the queue
 #' @param producer The producer for the source
 #' @param consumer The consumer of the source
-#' @param env An environment
 #' @export
 shinyQueue  <- function(source = defaultSource()$new(),
                         producer = ShinyProducer$new(source),
-                        consumer = ShinyConsumer$new(source, env),
-                        env = parent.frame()){
+                        consumer = ShinyConsumer$new(source)){
   Queue$new(source, producer, consumer)
 }

@@ -29,8 +29,6 @@ server <- function(input, output) {
   N <- 10
 
   interruptQueue <- shinyQueue()    # A Queue for the main thread to signal to the future
-  queue <- shinyQueue()             # A Queue for the future to signal to the main thread
-  queue$consumer$start()
 
   # progress variable must exist in the environment where "queue$consumer$start()"
   # was called, because that is the environment in which signals will be evaluated.
@@ -46,19 +44,15 @@ server <- function(input, output) {
     running(TRUE)
 
     # Create new progress bar
-    progress <<- Progress$new()
-    progress$set(message="Complex computation",value=0)
+    progress <- AsyncProgress$new()
 
     result_val(NULL)
 
 
     fut <- future({
       for(i in 1:N){
-        # Increment progress bar using N from this environment
-        queue$producer$fireEval({
-          cat(".")
-          progress$inc(1/N)
-        }, list(N=N))
+        # Increment progress bar
+        progress$inc(1/N)
 
         # Some important computation
         Sys.sleep(.5)

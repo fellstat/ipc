@@ -5,8 +5,8 @@
 \title{Create a Queue object}
 \usage{
 shinyQueue(source = defaultSource()$new(),
-  producer = ShinyProducer$new(source), consumer = ShinyConsumer$new(source,
-  env), env = parent.frame())
+  producer = ShinyProducer$new(source),
+  consumer = ShinyConsumer$new(source))
 }
 \arguments{
 \item{source}{The source for reading and writing the queue}
@@ -14,8 +14,6 @@ shinyQueue(source = defaultSource()$new(),
 \item{producer}{The producer for the source}
 
 \item{consumer}{The consumer of the source}
-
-\item{env}{An environment}
 }
 \description{
 Create a Queue object
