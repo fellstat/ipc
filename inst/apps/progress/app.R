@@ -41,18 +41,17 @@ server <- function(input, output) {
 
     # Create new progress bar
     progress <- AsyncProgress$new(message="Complex analysis")
-    #progress$set(message="Complex analysis")
 
     result_val(NULL)
 
 
     fut <- future({
       for(i in 1:N){
-        # Increment progress bar
-        progress$inc(1/N)
-
         # Some important computation
         Sys.sleep(.5)
+
+        # Increment progress bar
+        progress$inc(1/N)
 
         # throw errors that were signal (if Cancel was clicked)
         interruptor$execInterrupts()

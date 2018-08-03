@@ -27,8 +27,6 @@ ui <- fluidPage(
 server <- function(input, output) {
   N <- 10
 
-  interruptQueue <- shinyQueue()
-
   fut <- NULL
 
   result_val <- reactiveVal()
@@ -43,14 +41,7 @@ server <- function(input, output) {
     print("Starting Run")
     result_val(NULL)
     fut <<- future({
-      for(i in 1:N){
-
-        # Some important computation
-        Sys.sleep(.5)
-
-        # Evaluates interrupt signal (if Cancel is clicked)
-        #interruptQueue$consumer$consume()
-      }
+      Sys.sleep(6) # Some important operation
       result <- data.frame(result="Insightful analysis")
     })
     prom <- fut %...>% result_val
@@ -71,8 +62,13 @@ server <- function(input, output) {
   })
 
 
-  # Send interrupt signal to future
+  # Kill future
   observeEvent(input$cancel,{
+    #
+    # Use this method of stopping only if you don't have access to the
+    # internals of the long running process. If you are able, it is
+    # recommended to use AsyncInterruptor instead.
+    #
     stopMulticoreFuture(fut)
   })
 
