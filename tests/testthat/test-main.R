@@ -45,15 +45,18 @@ test_that("Main", {
 
   # Test Evaluation Context
   b <- 1
-  (function(){
+  cc <- (function(){
     b <- 5
     cons2 <- ShinyConsumer$new(q)
     prod$fireEval(b <- 2)
     cons2$consume()
     expect_true(b == 2)
+    prod$fireEval(b <- 3)
+    cons2
   })()
   expect_true(b == 1)
-
+  cc$consume()
+  expect_true(b == 3)
 
   # Test file truncation
   tq <- ShinyAsyncTools:::.TxTQ$new(tempfile())

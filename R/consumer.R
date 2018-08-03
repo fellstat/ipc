@@ -1,33 +1,34 @@
 Consumer <- R6Class(
   "Consumer",
   private = list(
-    source=NULL
+    source=NULL,
+    env = NULL
   ),
   public=list(
     executors = list(),
 
     stopped = FALSE,
 
-    env = NULL,
-
     laterHandle = NULL,
 
     initialize = function(source, env=parent.frame(2), ...){
-      self$env <- env
+      private$env <- env
       private$source <- source
       self$initExecutors()
     },
 
     initExecutors = function(){},
 
-    consume = function(safe=FALSE){
+    consume = function(safe=FALSE, env=parent.frame()){
+      oldenv <- private$env
+      on.exit(function() private$env <- oldenv)
+      private$env <- env
       contents <- private$source$pop()
       if(length(contents) == 0)
-        return(NULL)
+        return(list())
       signals <- names(contents)
       result <- list()
       for(i in 1:length(signals)){
-
         result[[i]] <- list()
         exec <- self$executors[[signals[i]]]
         if(!is.null(exec)){
@@ -40,15 +41,16 @@ Consumer <- R6Class(
           }
         }
       }
+      names(result) <- signals
       result
     },
 
-    start = function(millis=400){
+    start = function(millis=400, env=parent.frame()){
       self$stopped <- FALSE
       callback <- function(){
         if (self$stopped) return()
         tryCatch({
-          result <- self$consume(safe=TRUE)
+          result <- self$consume(safe=TRUE, env=env)
           if(!is.null(result)){
             for( i in seq_along(result)){
               for(j in seq_along(result[[i]])){
@@ -74,7 +76,7 @@ Consumer <- R6Class(
 
     addExecutor = function(func, signal){
       f <- func
-      #environment(f) <- self$env
+      #environment(f) <- private$env
       if(is.null(self$executors[[signal]]))
         self$executors[[signal]] <- list()
       index <- length(self$executors[[signal]]) + 1
@@ -141,22 +143,22 @@ ShinyConsumer <- R6Class(
 
     addEvalExecutor = function(){
       func <- function(signal, obj){
-        eval(obj, env=self$env)
+        eval(obj, env=private$env)
       }
       self$addExecutor(func, "eval")
     },
 
     addfunctorExecutor = function(){
       func <- function(signal, obj){
-        f <- get(obj[[1]], envir = self$env)
+        f <- get(obj[[1]], envir = private$env)
         f(obj[[2]])
       }
       self$addExecutor(func, "functor")
     },
 
-    start = function(session = shiny::getDefaultReactiveDomain(), millis=400){
+    start = function(millis=400, env=parent.frame(), session = shiny::getDefaultReactiveDomain()){
       session$onEnded(self$stop)
-      super$start(millis)
+      super$start(millis, env)
     },
 
     initExecutors = function(){

@@ -32,9 +32,8 @@ server <- function(input, output) {
   queue <- shinyQueue()             # A Queue for the future to signal to the main thread
   queue$consumer$start()
 
-  # progress variable must exist in the environment that "queue"
-  # was instantiated in, because that is the environment in which
-  # signals will be evaulated.
+  # progress variable must exist in the environment where "queue$consumer$start()"
+  # was called, because that is the environment in which signals will be evaluated.
   progress <- NULL
 
   result_val <- reactiveVal()
