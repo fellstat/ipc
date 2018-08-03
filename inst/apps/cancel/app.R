@@ -29,14 +29,12 @@ server <- function(input, output) {
   N <- 10
 
   interruptQueue <- shinyQueue()
-  queue <- shinyQueue()
-  queue$consumer$start()
 
   result_val <- reactiveVal()
   running <- reactiveVal(FALSE)
   observeEvent(input$run,{
 
-    #Don't do anything if in the iddle of a run
+    #Don't do anything if in the middle of a run
     if(running())
       return(NULL)
     running(TRUE)
@@ -45,13 +43,15 @@ server <- function(input, output) {
     result_val(NULL)
     fut <- future({
       for(i in 1:N){
-        queue$producer$fireEval(cat("."))
-        interruptQueue$consumer$consume() # Evaluates interrupt signal (if cancel is clicked)
+
+        # Some important computation
         Sys.sleep(.5)
+
+        # Evaluates interrupt signal (if Cancel is clicked)
+        interruptQueue$consumer$consume()
       }
-      result <- data.frame(result="Insightfull analysis")
-      queue$producer$fireAssignReactive("result_val",result)
-    })
+      result <- data.frame(result="Insightful analysis")
+    }) %...>% result_val
     fut <- catch(fut,
                  function(e){
                    result_val(NULL)
@@ -60,7 +60,7 @@ server <- function(input, output) {
                  })
     fut <- finally(fut, function(){
       print("Done")
-      running(FALSE) #decalre done with run
+      running(FALSE) #declare done with run
     })
 
     #Return something other than the future so we don't block the UI

@@ -55,23 +55,34 @@ server <- function(input, output) {
 
     fut <- future({
       for(i in 1:N){
-        queue$producer$fireEval(cat("."))
-        interruptQueue$consumer$consume() # Evaluates interrupt signal (if cancel is clicked)
-        queue$producer$fireEval(progress$inc(1/N), list(N=N)) #increments progress bar
-        Sys.sleep(.5) # some imporant computation
+        # Increment progress bar using N from this environment
+        queue$producer$fireEval({
+          cat(".")
+          progress$inc(1/N)
+        }, list(N=N))
+
+        # Some important computation
+        Sys.sleep(.5)
+
+        # Evaluate interrupt signal (if Cancel is clicked)
+        interruptQueue$consumer$consume()
       }
-      result <- data.frame(result="Insightful analysis")
-      queue$producer$fireAssignReactive("result_val",result)
-    })
+
+      data.frame(result="Insightful analysis")
+    }) %...>% result_val
+
+    # Show notification on error or user interrupt
     fut <- catch(fut,
                  function(e){
                    result_val(NULL)
                    print(e$message)
                    showNotification(e$message)
                  })
+
+    # When done with analysis, remove progress bar
     fut <- finally(fut, function(){
       progress$close()
-      running(FALSE) # declare done with run
+      running(FALSE) # Declare done with run
     })
 
     # Return something other than the future so we don't block the UI
