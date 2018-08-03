@@ -31,30 +31,26 @@ server <- function(input, output) {
 
   queue <- shinyQueue()
   queue$consumer$start()
+
   color <- reactiveVal("grey")
 
-  running <- reactiveVal(FALSE)
+  # Watch for a change in the slider to start colors changing
   observeEvent(input$bins, {
-    if(running())
-      return(NULL)
-    running(TRUE)
     # Don't do anything if in the process of cycling through colors
     if(color() != "grey")
       return(NULL)
+    color("black")
 
     #Cycle through colors and then back to grey
-    finally(
-      future({
-        queue$producer$fireEval(print("Cycling Through The Rainbow!!!"))
-        cols <- c(rainbow(10), "grey")
-        for(i in 1:11){
-          Sys.sleep(1)
-          #queue$producer$fireNotify(paste("Changing color to", cols[i]))
-          queue$producer$fireAssignReactive("color", cols[i])
-        }
-      }),
-    function() running(FALSE)
-    )
+    future({
+      queue$producer$fireEval(print("Cycling Through The Rainbow!!!"))
+      cols <- c(rainbow(10), "grey")
+      for(i in 1:11){
+        Sys.sleep(1)
+        #queue$producer$fireNotify(paste("Changing color to", cols[i]))
+        queue$producer$fireAssignReactive("color", cols[i])
+      }
+    })
 
     #Return something other than the future so we don't block the UI
     NULL
@@ -66,7 +62,7 @@ server <- function(input, output) {
     x    <- faithful[, 2]
     bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
-    # draw the histogram with the specified number of bins
+    # draw the histogram with the specified color and number of bins
     hist(x, breaks = bins, col = color(), border = 'white')
   })
 
