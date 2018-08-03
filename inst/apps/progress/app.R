@@ -2,7 +2,7 @@ library(shiny)
 library(ShinyAsyncTools)
 library(future)
 library(promises)
-plan(multicore)
+plan(multiprocess)
 
 
 # Define UI for application that draws a histogram
@@ -28,11 +28,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   N <- 10
 
-  interruptQueue <- shinyQueue()    # A Queue for the main thread to signal to the future
-
-  # progress variable must exist in the environment where "queue$consumer$start()"
-  # was called, because that is the environment in which signals will be evaluated.
-  progress <- NULL
+  interruptor <- AsyncInterruptor$new()    # To signal STOP to the future
 
   result_val <- reactiveVal()
   running <- reactiveVal(FALSE)
@@ -44,7 +40,8 @@ server <- function(input, output) {
     running(TRUE)
 
     # Create new progress bar
-    progress <- AsyncProgress$new()
+    progress <- AsyncProgress$new(message="Complex analysis")
+    #progress$set(message="Complex analysis")
 
     result_val(NULL)
 
@@ -57,8 +54,8 @@ server <- function(input, output) {
         # Some important computation
         Sys.sleep(.5)
 
-        # Evaluate interrupt signal (if Cancel is clicked)
-        interruptQueue$consumer$consume()
+        # throw errors that were signal (if Cancel was clicked)
+        interruptor$execInterrupts()
       }
 
       data.frame(result="Insightful analysis")
@@ -86,7 +83,7 @@ server <- function(input, output) {
   # Send interrupt signal to future
   observeEvent(input$cancel,{
     if(running())
-      interruptQueue$producer$fireInterrupt("User Interrupt")
+      interruptor$interrupt("User Interrupt")
   })
 
 

@@ -8,10 +8,12 @@ AsyncProgress <- R6Class(
     progress=NULL
   ),
   public = list(
-    initialize = function(..., millis=400){
-      private$queue <- shinyQueue()
+    initialize = function(..., queue=shinyQueue(), millis=250, value=NULL, message=NULL, detail=NULL){
+      private$queue <- queue
       private$progress <- Progress$new(...)
-      private$queue$consumer$start()
+      if(!(is.null(value) && is.null(message) && is.null(detail)))
+        private$progress$set(value=value, message=message, detail=detail)
+      private$queue$consumer$start(millis)
     },
 
     getMax = function() private$progress$getMax(),

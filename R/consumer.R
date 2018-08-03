@@ -47,7 +47,7 @@ Consumer <- R6Class(
       result
     },
 
-    start = function(millis=400, env=parent.frame()){
+    start = function(millis=250, env=parent.frame()){
       self$stopped <- FALSE
       callback <- function(){
         if (self$stopped) return()
@@ -77,12 +77,10 @@ Consumer <- R6Class(
 
 
     addExecutor = function(func, signal){
-      f <- func
-      #environment(f) <- private$env
       if(is.null(self$executors[[signal]]))
         self$executors[[signal]] <- list()
       index <- length(self$executors[[signal]]) + 1
-      self$executors[[signal]][[index]] <- f
+      self$executors[[signal]][[index]] <- func
       index
     },
 

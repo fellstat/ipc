@@ -2,8 +2,7 @@ library(shiny)
 library(ShinyAsyncTools)
 library(future)
 library(promises)
-plan(multicore)
-
+plan(multicore)    # This will only work with multicore, which is unavailable on Windows
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -30,6 +29,8 @@ server <- function(input, output) {
 
   interruptQueue <- shinyQueue()
 
+  fut <- NULL
+
   result_val <- reactiveVal()
   running <- reactiveVal(FALSE)
   observeEvent(input$run,{
@@ -41,27 +42,29 @@ server <- function(input, output) {
 
     print("Starting Run")
     result_val(NULL)
-    fut <- future({
+    fut <<- future({
       for(i in 1:N){
 
         # Some important computation
         Sys.sleep(.5)
 
         # Evaluates interrupt signal (if Cancel is clicked)
-        interruptQueue$consumer$consume()
+        #interruptQueue$consumer$consume()
       }
       result <- data.frame(result="Insightful analysis")
-    }) %...>% result_val
-    fut <- catch(fut,
+    })
+    prom <- fut %...>% result_val
+    prom <- catch(fut,
                  function(e){
                    result_val(NULL)
                    print(e$message)
-                   showNotification(e$message)
+                   showNotification("Task Stopped")
                  })
-    fut <- finally(fut, function(){
+    prom <- finally(prom, function(){
       print("Done")
       running(FALSE) #declare done with run
     })
+
 
     #Return something other than the future so we don't block the UI
     NULL
@@ -70,8 +73,7 @@ server <- function(input, output) {
 
   # Send interrupt signal to future
   observeEvent(input$cancel,{
-    if(running())
-      interruptQueue$producer$fireInterrupt("User Interrupt")
+    stopMulticoreFuture(fut)
   })
 
 

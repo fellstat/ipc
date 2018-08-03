@@ -61,13 +61,16 @@ TextFileSource <- R6Class(
     },
 
     pop = function(n=-1){
+      if(self$destroyed)
+        return(list())
       l <- self$q$pop(n)
       result <- list()
-      if(self$destroyed || nrow(l) == 0)
+      if(nrow(l) == 0)
         return(list())
       for(i in 1:nrow(l)){
         v <- l[i,2]
-        result[[l[i,1]]] <- stringToObject(l[i,2])
+        result[[i]] <- stringToObject(l[i,2])
+        names(result)[i] <- l[i,1]
       }
       result
     },
@@ -80,7 +83,7 @@ TextFileSource <- R6Class(
     },
 
     destroy = function(){
-      if(!destroyed){
+      if(!self$destroyed){
         self$destroyed <- TRUE
         self$q$destroy()
       }

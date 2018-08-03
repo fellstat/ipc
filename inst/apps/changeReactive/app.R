@@ -1,7 +1,7 @@
 library(shiny)
 library(ShinyAsyncTools)
 library(future)
-plan(multicore)
+plan(multiprocess)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
