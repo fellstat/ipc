@@ -1,3 +1,5 @@
+#' A Class for sending tasks to a source
+#' @export
 Producer <- R6Class(
   "Producer",
   private = list(
@@ -15,6 +17,8 @@ Producer <- R6Class(
   )
 )
 
+#' A Producer with methods specific for Shiny
+#' @export
 ShinyProducer <- R6Class(
   "ShinyProducer",
   inherit=Producer,

@@ -1,3 +1,5 @@
+#' A Class containing a producer and consumer
+#' @export
 Queue <- R6Class(
   "Queue",
   private = list(
@@ -14,10 +16,15 @@ Queue <- R6Class(
   )
 )
 
-
+#' Create a Queue object
+#' @param source The source for reading and writing the queue
+#' @param producer The producer for the source
+#' @param consumer The consumer of the source
+#' @param env An environment
+#' @export
 shinyQueue  <- function(source = defaultSource()$new(),
                         producer = ShinyProducer$new(source),
-                        consumer = ShinyConsumer$new(source, envir),
-                        envir = parent.frame()){
+                        consumer = ShinyConsumer$new(source, env),
+                        env = parent.frame()){
   Queue$new(source, producer, consumer)
 }

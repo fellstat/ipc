@@ -42,6 +42,10 @@ stringToObject <- function(strg){
   )
 )
 
+#' Reads and writes the queue to a text file
+#' @details
+#' A thin wrapper around \code{txtq}
+#' @export
 TextFileSource <- R6Class(
   "TextFileSource",
   public = list(

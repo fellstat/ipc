@@ -1,3 +1,5 @@
+#' A Class for reading and executing tasks from a source
+#' @export
 Consumer <- R6Class(
   "Consumer",
   private = list(
@@ -98,7 +100,8 @@ Consumer <- R6Class(
   )
 )
 
-
+#' A Consumer class with common task executors useful in Shiny apps
+#' @export
 ShinyConsumer <- R6Class(
   "ShinyConsumer",
   inherit=Consumer,
