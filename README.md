@@ -15,7 +15,7 @@ devtools::install_github("fellstat/ShinyAsyncTools")
 ## Resources
 
 
-* For a more detailed description of what can be done with the ``ShinyAsyncTools`` package, **[see the introductory vignette](inst/doc/shinymp.html)**.
+* For a more detailed description of what can be done with the ``ShinyAsyncTools`` package, **[see the introductory vignette](http://htmlpreview.github.io/?https://github.com/fellstat/ShinyAsyncTools/blob/master/inst/doc/shinymp.html)**.
 
 To run an example application locally use:
 ```
