@@ -10,6 +10,7 @@ To install the latest development version from the github repo run:
 # install.packages("devtools")
 
 devtools::install_github("fellstat/ShinyAsyncTools")
+```
 
 ## Resources
 
