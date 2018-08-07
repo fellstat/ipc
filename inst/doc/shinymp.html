@@ -159,7 +159,7 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
   
   <span class="co"># Handle button click</span>
   <span class="kw">observeEvent</span>(input<span class="op">$</span>run,{
-    fut &lt;&lt;-<span class="st"> </span><span class="kw">future</span>({
+    <span class="kw">future</span>({
       <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">10</span><span class="op">:</span><span class="dv">0</span>){
         <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
         result &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">count=</span>i)
@@ -215,7 +215,7 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
     
     <span class="co"># Create a progress bar</span>
     progress &lt;-<span class="st"> </span>AsyncProgress<span class="op">$</span><span class="kw">new</span>(<span class="dt">message=</span><span class="st">&quot;Complex analysis&quot;</span>)
-    fut &lt;&lt;-<span class="st"> </span><span class="kw">future</span>({
+    <span class="kw">future</span>({
       <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>){
         <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
         progress<span class="op">$</span><span class="kw">inc</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">10</span>) <span class="co"># Increment progress bar</span>

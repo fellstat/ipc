@@ -68,7 +68,7 @@ inter$destroy()
 #  
 #    # Handle button click
 #    observeEvent(input$run,{
-#      fut <<- future({
+#      future({
 #        for(i in 10:0){
 #          Sys.sleep(1)
 #          result <- data.frame(count=i)
@@ -122,7 +122,7 @@ inter$destroy()
 #  
 #      # Create a progress bar
 #      progress <- AsyncProgress$new(message="Complex analysis")
-#      fut <<- future({
+#      future({
 #        for(i in 1:10){
 #          Sys.sleep(1)
 #          progress$inc(1/10) # Increment progress bar
