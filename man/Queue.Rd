@@ -4,10 +4,6 @@
 \name{Queue}
 \alias{Queue}
 \title{A Class containing a producer and consumer}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-Queue
-}
 \description{
 A Class containing a producer and consumer
 }

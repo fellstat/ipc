@@ -4,11 +4,48 @@
 \name{Consumer}
 \alias{Consumer}
 \title{A Class for reading and executing tasks from a source}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-Consumer
+\arguments{
+\item{source}{a source, e.g. TextFileSource.}
+
+\item{millis}{milliseconds.}
+
+\item{env}{An enviroment specifying where to execute signals.}
+
+\item{signal}{A string.}
+
+\item{index}{A position.}
 }
 \description{
-A Class for reading and executing tasks from a source
+\strong{Methods}
+  \describe{
+    \item{\code{initialize(source, env=parent.frame(2), ...)}}{
+      Creates a Consumer object linked to the \code{source}. Signals will be
+      executed in the \code{env} environment.
+    }
+    \item{\code{consume(safe=FALSE, env=parent.frame())}}{
+      Executes all (unprocessed) signals fired to source from a Producer.
+      if \code{safe} evaluation is wrapped with \code{try}. Signals are
+      executed in the \code{env} environment.
+    }
+    \item{\code{start(millis=250, env=parent.frame())}}{
+      Starts executing \code{consume} every \code{millis} milliseconds. Signals are
+      executed in the \code{env} environment.
+    }
+    \item{\code{stop()}}{
+      Stops the periodic execution of \code{consume}.
+    }
+    \item{\code{clearExecutors()}}{
+      Removes all executors
+    }
+    \item{\code{removeExecutor(signal, index)()}}{
+      Removes executor from 'signal' with position index
+    }
+    \item{\code{initExecutors()}}{
+      Adds the two default executeors.
+    }
+    \item{\code{finalize()}}{
+      runs stop on object distruction
+    }
+  }
 }
 \keyword{datasets}

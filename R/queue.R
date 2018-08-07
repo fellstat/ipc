@@ -1,4 +1,6 @@
 #' A Class containing a producer and consumer
+#' @format NULL
+#' @usage NULL
 #' @export
 Queue <- R6Class(
   "Queue",
@@ -16,9 +18,6 @@ Queue <- R6Class(
     destroy = function(){
       self$consumer$stop()
       private$source$destroy()
-      private$source <- NULL
-      self$producer <- NULL
-      self$consumer <- NULL
     }
   )
 )

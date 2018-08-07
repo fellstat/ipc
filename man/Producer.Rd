@@ -3,12 +3,32 @@
 \docType{data}
 \name{Producer}
 \alias{Producer}
-\title{A Class for sending tasks to a source}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-Producer
-}
+\title{A Class for sending signals to a source}
 \description{
-A Class for sending tasks to a source
+\strong{Methods}
+  \describe{
+    \item{\code{initialize(source, ...)}}{
+      Creates a Producer object linked to the \code{source}.
+    }
+    \item{\code{fire(signal, obj=NA)}}{
+      Sends a signal to the source with associates object \code{obj}.
+    }
+    \item{\code{fireEval(expr, env)}}{
+      Signals for execution of the expression \code{obj} with values from
+      the environment (or list) \code{env} substituted in.
+    }
+    \item{\code{fireFunction(name, param)}}{
+      Signals for execution of the function whose string value is \code{obj}
+      with the parameters in list \code{param}.
+    }
+ }
+}
+\details{
+@param obj The object to associate with the signal.
+    @param signal A string signal to send.
+    @param env An environment or list for substitution
+    @param param A list of function parameters.
+    @param expr An expression to evaluate.
+    @param name the name of the fucntion
 }
 \keyword{datasets}

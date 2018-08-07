@@ -1,0 +1,233 @@
+## ----echo=TRUE-----------------------------------------------------------
+library(ShinyAsyncTools)
+library(future)
+plan(multiprocess)
+q <- shinyQueue()
+
+value <- ""
+
+f <- future({
+  # set value in the main thread
+  q$producer$fireEval({
+    value <- "Hello world"
+  })
+})
+
+Sys.sleep(.5)
+# Evaluate signals
+cons <- q$consumer$consume()
+print(value)
+
+
+# Remove temporary files
+q$destroy()
+
+## ----echo=TRUE-----------------------------------------------------------
+library(future)
+library(promises)
+plan(multiprocess)
+inter <- AsyncInterruptor$new()
+fut <- future({
+  for(i in 1:1000){
+    Sys.sleep(.1)
+    inter$execInterrupts()
+ }
+})
+inter$interrupt("Error: Stop Future")
+cat(try(value(fut)))
+inter$destroy()
+
+## ---- eval=FALSE---------------------------------------------------------
+#  library(shiny)
+#  library(ShinyAsyncTools)
+#  library(future)
+#  plan(multiprocess)
+#  
+#  ui <- fluidPage(
+#  
+#    titlePanel("Countdown"),
+#  
+#    sidebarLayout(
+#      sidebarPanel(
+#        actionButton('run', 'count down')
+#      ),
+#  
+#      mainPanel(
+#        tableOutput("result")
+#      )
+#    )
+#  )
+#  
+#  server <- function(input, output) {
+#  
+#    queue <- shinyQueue()
+#    queue$consumer$start(100) # Execute signals every 100 milliseconds
+#  
+#    # A reactive value to hold output
+#    result_val <- reactiveVal()
+#  
+#    # Handle button click
+#    observeEvent(input$run,{
+#      fut <<- future({
+#        for(i in 10:0){
+#          Sys.sleep(1)
+#          result <- data.frame(count=i)
+#          # change value
+#          queue$producer$fireAssignReactive("result_val",result)
+#        }
+#      })
+#  
+#      #Return something other than the future so we don't block the UI
+#      NULL
+#    })
+#  
+#    # set output to reactive value
+#    output$result <- renderTable({
+#      req(result_val())
+#    })
+#  }
+#  
+#  # Run the application
+#  shinyApp(ui = ui, server = server)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  library(shiny)
+#  library(ShinyAsyncTools)
+#  library(future)
+#  plan(multiprocess)
+#  
+#  ui <- fluidPage(
+#  
+#    titlePanel("Countdown"),
+#  
+#    sidebarLayout(
+#      sidebarPanel(
+#        actionButton('run', 'Run')
+#      ),
+#  
+#      mainPanel(
+#        tableOutput("result")
+#      )
+#    )
+#  )
+#  
+#  server <- function(input, output) {
+#  
+#    # A reactive value to hold output
+#    result_val <- reactiveVal()
+#  
+#    # Handle button click
+#    observeEvent(input$run,{
+#      result_val(NULL)
+#  
+#      # Create a progress bar
+#      progress <- AsyncProgress$new(message="Complex analysis")
+#      fut <<- future({
+#        for(i in 1:10){
+#          Sys.sleep(1)
+#          progress$inc(1/10) # Increment progress bar
+#        }
+#        progress$close() # Close the progress bar
+#        data.frame(result="Insightful result")
+#      }) %...>% result_val  # Assign result of future to result_val
+#  
+#      # Return something other than the future so we don't block the UI
+#      NULL
+#    })
+#  
+#    # Set output to reactive value
+#    output$result <- renderTable({
+#      req(result_val())
+#    })
+#  }
+#  
+#  # Run the application
+#  shinyApp(ui = ui, server = server)
+
+## ----eval=FALSE----------------------------------------------------------
+#  library(shiny)
+#  library(ShinyAsyncTools)
+#  library(future)
+#  library(promises)
+#  plan(multicore)    # This will only work with multicore, which is unavailable on Windows
+#  
+#  inaccessableAnalysisFunction <- function(){
+#    Sys.sleep(10)
+#    data.frame(result="Insightful analysis")
+#  }
+#  
+#  # Define UI for application that draws a histogram
+#  ui <- fluidPage(
+#  
+#    # Application title
+#    titlePanel("Cancelable Async Task"),
+#  
+#    # Sidebar with a slider input for number of bins
+#    sidebarLayout(
+#      sidebarPanel(
+#        actionButton('run', 'Run'),
+#        actionButton('cancel', 'Cancel')
+#      ),
+#  
+#      # Show a plot of the generated distribution
+#      mainPanel(
+#        tableOutput("result")
+#      )
+#    )
+#  )
+#  
+#  server <- function(input, output) {
+#  
+#    fut <- NULL
+#  
+#    result_val <- reactiveVal()
+#    running <- reactiveVal(FALSE)
+#    observeEvent(input$run,{
+#  
+#      #Don't do anything if in the middle of a run
+#      if(running())
+#        return(NULL)
+#      running(TRUE)
+#  
+#      print("Starting Run")
+#      result_val(NULL)
+#      fut <<- future({
+#        result <- inaccessableAnalysisFunction()
+#      })
+#      prom <- fut %...>% result_val
+#      prom <- catch(fut,
+#                   function(e){
+#                     result_val(NULL)
+#                     print(e$message)
+#                     showNotification("Task Stopped")
+#                   })
+#      prom <- finally(prom, function(){
+#        print("Done")
+#        running(FALSE) #declare done with run
+#      })
+#  
+#  
+#      #Return something other than the future so we don't block the UI
+#      NULL
+#    })
+#  
+#  
+#    # Kill future
+#    observeEvent(input$cancel,{
+#      #
+#      # Use this method of stopping only if you don't have access to the
+#      # internals of the long running process. If you are able, it is
+#      # recommended to use AsyncInterruptor instead.
+#      #
+#      stopMulticoreFuture(fut)
+#    })
+#  
+#  
+#    output$result <- renderTable({
+#      req(result_val())
+#    })
+#  }
+#  
+#  # Run the application
+#  shinyApp(ui = ui, server = server)
+

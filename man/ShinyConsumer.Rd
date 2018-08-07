@@ -4,11 +4,9 @@
 \name{ShinyConsumer}
 \alias{ShinyConsumer}
 \title{A Consumer class with common task executors useful in Shiny apps}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-ShinyConsumer
-}
 \description{
-A Consumer class with common task executors useful in Shiny apps
+In addtion to 'eval' and 'function' signals, ShinyConsumer object
+process 'interrupt' and 'notify' signals for throwing errors and
+displying Shiny notifictions.
 }
 \keyword{datasets}

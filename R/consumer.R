@@ -1,10 +1,66 @@
 #' A Class for reading and executing tasks from a source
+#'
+#' \strong{Methods}
+#'   \describe{
+#'     \item{\code{initialize(source, env=parent.frame(2), ...)}}{
+#'       Creates a Consumer object linked to the \code{source}. Signals will be
+#'       executed in the \code{env} environment.
+#'     }
+#'     \item{\code{consume(safe=FALSE, env=parent.frame())}}{
+#'       Executes all (unprocessed) signals fired to source from a Producer.
+#'       if \code{safe} evaluation is wrapped with \code{try}. Signals are
+#'       executed in the \code{env} environment.
+#'     }
+#'     \item{\code{start(millis=250, env=parent.frame())}}{
+#'       Starts executing \code{consume} every \code{millis} milliseconds. Signals are
+#'       executed in the \code{env} environment.
+#'     }
+#'     \item{\code{stop()}}{
+#'       Stops the periodic execution of \code{consume}.
+#'     }
+#'     \item{\code{clearExecutors()}}{
+#'       Removes all executors
+#'     }
+#'     \item{\code{removeExecutor(signal, index)()}}{
+#'       Removes executor from 'signal' with position index
+#'     }
+#'     \item{\code{initExecutors()}}{
+#'       Adds the two default executeors.
+#'     }
+#'     \item{\code{finalize()}}{
+#'       runs stop on object distruction
+#'     }
+#'   }
+#'
+#' @param source a source, e.g. TextFileSource.
+#' @param millis milliseconds.
+#' @param env An enviroment specifying where to execute signals.
+#' @param signal A string.
+#' @param index A position.
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 Consumer <- R6Class(
   "Consumer",
   private = list(
     source=NULL,
-    env = NULL
+    env = NULL,
+
+    addEvalExecutor = function(){
+      func <- function(signal, obj){
+        eval(obj, env=private$env)
+      }
+      self$addExecutor(func, "eval")
+    },
+
+    addfunctionExecutor = function(){
+      func <- function(signal, obj){
+        f <- get(obj[[1]], envir = private$env)
+        do.call(f, obj[[2]])
+      }
+      self$addExecutor(func, "function")
+    }
   ),
   public=list(
     executors = list(),
@@ -19,9 +75,11 @@ Consumer <- R6Class(
       self$initExecutors()
     },
 
-    initExecutors = function(){},
-
     consume = function(safe=FALSE, env=parent.frame()){
+      #if(private$source$isDestroyed()){
+      #  warning("Consumer has been destroyed")
+      #  return(list())
+      #}
       oldenv <- private$env
       on.exit(function() private$env <- oldenv)
       private$env <- env
@@ -75,7 +133,6 @@ Consumer <- R6Class(
       self$laterHandle <- NULL
     },
 
-
     addExecutor = function(func, signal){
       if(is.null(self$executors[[signal]]))
         self$executors[[signal]] <- list()
@@ -92,6 +149,12 @@ Consumer <- R6Class(
       self$executors[[signal]][[index]] <- NULL
     },
 
+
+    initExecutors = function(){
+      private$addfunctionExecutor()
+      private$addEvalExecutor()
+    },
+
     finalize = function() {
       self$stop()
     }
@@ -99,19 +162,17 @@ Consumer <- R6Class(
 )
 
 #' A Consumer class with common task executors useful in Shiny apps
+#'
+#' In addtion to 'eval' and 'function' signals, ShinyConsumer object
+#' process 'interrupt' and 'notify' signals for throwing errors and
+#' displying Shiny notifictions.
+#' @format NULL
+#' @usage NULL
 #' @export
 ShinyConsumer <- R6Class(
   "ShinyConsumer",
   inherit=Consumer,
-  public = list(
-    session=NULL,
-    initialize = function(source,
-                          env=parent.frame(2),
-                          session=shiny::getDefaultReactiveDomain(),
-                          ...){
-      super$initialize(source, env, ...)
-      self$session <- session
-    },
+  private = list(
     addInterruptExecutor = function(){
       func <- function(signal, obj){
         if(is.null(obj))
@@ -139,34 +200,29 @@ ShinyConsumer <- R6Class(
         do.call(shiny::showNotification, msg)
       }
       self$addExecutor(func, "Notify")
+    }
+  ),
+  public = list(
+    session=NULL,
+
+    initialize = function(source,
+                          env=parent.frame(2),
+                          session=shiny::getDefaultReactiveDomain(),
+                          ...){
+      super$initialize(source, env, ...)
+      self$session <- session
     },
 
-
-    addEvalExecutor = function(){
-      func <- function(signal, obj){
-        eval(obj, env=private$env)
-      }
-      self$addExecutor(func, "eval")
-    },
-
-    addfunctorExecutor = function(){
-      func <- function(signal, obj){
-        f <- get(obj[[1]], envir = private$env)
-        f(obj[[2]])
-      }
-      self$addExecutor(func, "functor")
-    },
-
-    start = function(millis=400, env=parent.frame(), session = shiny::getDefaultReactiveDomain()){
-      session$onEnded(self$stop)
+    start = function(millis=250, env=parent.frame(), session = shiny::getDefaultReactiveDomain()){
+      if(!is.null(session))
+        session$onEnded(self$stop)
       super$start(millis, env)
     },
 
     initExecutors = function(){
-      self$addNotifyExecutor()
-      self$addInterruptExecutor()
-      self$addEvalExecutor()
-      self$addfunctorExecutor()
+      super$initExecutors()
+      private$addNotifyExecutor()
+      private$addInterruptExecutor()
     }
   )
 )

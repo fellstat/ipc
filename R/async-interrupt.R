@@ -1,4 +1,46 @@
-#' An interruptor useful for stopping child processes
+#' An interruptor useful for stopping child processes.
+#'
+#' This class is a simple wrapper around a Queue object
+#' making adding interrupt checking to future code easy
+#' to implement and read.
+#'
+#' \strong{Methods}
+#'   \describe{
+#'     \item{\code{initialize(queue=shinyQueue())}}{
+#'       Creates a new interruptor.
+#'     }
+#'     \item{\code{interrupt(msg="Signaled Interrupt")}}{
+#'       Signals an interrupt
+#'     }
+#'     \item{\code{execInterrupts()}}{
+#'       Executes anything pushed to the queue, including interrupts.
+#'     }
+#'     \item{\code{getInterrupts()}}{
+#'       Gets the result of the queue's executing, not throwing the interrupts.
+#'     }
+#'   }
+#'
+#' @param msg An error message string.
+#'
+#' @examples
+#' library(future)
+#' plan(multiprocess)
+#' library(promises)
+#' inter <- AsyncInterruptor$new()
+#' fut <- future({
+#'   for(i in 1:100){
+#'     Sys.sleep(.01)
+#'     inter$execInterrupts()
+#'   }
+#' })
+#' catch(fut, function(e) print(paste0("From future --- ", e$message)))
+#'
+#' inter$interrupt("Error: Stop Future")
+#' Sys.sleep(.1)
+#' inter$destroy()
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 AsyncInterruptor <- R6Class(
   "AsyncInterruptor",
@@ -20,13 +62,26 @@ AsyncInterruptor <- R6Class(
 
     getInterrupts = function(){
       private$queue$consumer$consume(safe=TRUE)
+    },
+
+    destroy = function(){
+      private$queue$destroy()
     }
   )
 )
 
 
 #' Stops a future run in a multicore plan
+#'
 #' @param x The MulticoreFuture
+#'
+#' @details
+#' This function sends terminate and kill signals to the process running the future,
+#' and will only work for futures run on a multicore plan. This approach is not
+#' recommended for cases where you can listen for interrupts within the future
+#' (with \code{AsyncInterruptor}). However, for cases where long running code is
+#' in an external library for which you don't have control, this can be the only way
+#' to terminate the execution.
 #' @export
 stopMulticoreFuture <- function(x){
   if(!inherits(x,"MulticoreFuture")){

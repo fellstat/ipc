@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Ian Fellows" />
+
+<meta name="date" content="2018-08-07" />
+
+<title>Tools for Asynchronous Processing with Shiny</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Tools for Asynchronous Processing with Shiny</h1>
+<h4 class="author"><em>Ian Fellows</em></h4>
+<h4 class="date"><em>2018-08-07</em></h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>ShinyAsyncTools provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.</p>
+</div>
+<div id="quick-start" class="section level2">
+<h2>Quick Start</h2>
+<p>Perhaps the most important use of this package is to comminicate with a parent thread from a child thread executed using the <code>future</code> package. This is very easy to do. Simply create and start a <code>Queue</code> in the parent thread. The child thread can then send messages and evaluate R code on the main thread.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(future)
+<span class="kw">plan</span>(multiprocess)
+q &lt;-<span class="st"> </span><span class="kw">shinyQueue</span>()
+
+value &lt;-<span class="st"> &quot;&quot;</span>
+
+f &lt;-<span class="st"> </span><span class="kw">future</span>({
+  <span class="co"># set value in the main thread</span>
+  q<span class="op">$</span>producer<span class="op">$</span><span class="kw">fireEval</span>({
+    value &lt;-<span class="st"> &quot;Hello world&quot;</span>
+  })
+})
+
+<span class="kw">Sys.sleep</span>(.<span class="dv">5</span>)
+<span class="co"># Evaluate signals</span>
+cons &lt;-<span class="st"> </span>q<span class="op">$</span>consumer<span class="op">$</span><span class="kw">consume</span>()
+<span class="kw">print</span>(value)</code></pre></div>
+<pre><code>## [1] &quot;Hello world&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Remove temporary files</span>
+q<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
+<p>A <code>Queue</code> object has a <code>producer</code> field that is used to send signals onto the <code>Queue</code> and a <code>consumer</code> field that is used to read from the queue, and process any signals written to the <code>Queue</code>.</p>
+<div id="interrupting-a-long-running-process" class="section level3">
+<h3>Interrupting a long running process</h3>
+<p>Signals can also be sent from the main thread to a child. In Shiny, a typical use case for this is to send interrupts to long running child processes. <code>ShinyAsyncTools</code> has a simple wrapper class that make this very easy <code>AsyncInterruptor</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
+<span class="kw">library</span>(promises)
+<span class="kw">plan</span>(multiprocess)
+inter &lt;-<span class="st"> </span>AsyncInterruptor<span class="op">$</span><span class="kw">new</span>()
+fut &lt;-<span class="st"> </span><span class="kw">future</span>({
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>){
+    <span class="kw">Sys.sleep</span>(.<span class="dv">1</span>)
+    inter<span class="op">$</span><span class="kw">execInterrupts</span>()
+ }
+})
+inter<span class="op">$</span><span class="kw">interrupt</span>(<span class="st">&quot;Error: Stop Future&quot;</span>)
+<span class="kw">cat</span>(<span class="kw">try</span>(<span class="kw">value</span>(fut)))</code></pre></div>
+<pre><code>## Error in func(signals[i], contents[[i]]) : Error: Stop Future</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">inter<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
+</div>
+</div>
+<div id="use-in-shiny" class="section level2">
+<h2>Use in Shiny</h2>
+<p>The primary usecase for this package is to support Shiny applications. You can view three example applications using the <code>shinyExample</code> function.</p>
+<div id="changing-a-reactive-value-from-a-future" class="section level3">
+<h3>Changing a reactive value from a future</h3>
+<p>Reactive values can not be changed directly from within a future. Queues make it easy to signal the main thread to assign a reactive value from within the body of a future.</p>
+<p>The application below creates a future every time countdown is clicked, which assigns a value to the reactive value every second, counting down from 10 to 0. If you click the button mutliple times, each future will compete to set the value, and the numbers will jump around.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(future)
+<span class="kw">plan</span>(multiprocess)
+
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+
+  <span class="kw">titlePanel</span>(<span class="st">&quot;Countdown&quot;</span>),
+
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">actionButton</span>(<span class="st">'run'</span>, <span class="st">'count down'</span>)
+    ),
+
+    <span class="kw">mainPanel</span>(
+      <span class="kw">tableOutput</span>(<span class="st">&quot;result&quot;</span>)
+    )
+  )
+)
+
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {
+
+  queue &lt;-<span class="st"> </span><span class="kw">shinyQueue</span>()
+  queue<span class="op">$</span>consumer<span class="op">$</span><span class="kw">start</span>(<span class="dv">100</span>) <span class="co"># Execute signals every 100 milliseconds</span>
+
+  <span class="co"># A reactive value to hold output</span>
+  result_val &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>()
+  
+  <span class="co"># Handle button click</span>
+  <span class="kw">observeEvent</span>(input<span class="op">$</span>run,{
+    fut &lt;&lt;-<span class="st"> </span><span class="kw">future</span>({
+      <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">10</span><span class="op">:</span><span class="dv">0</span>){
+        <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
+        result &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">count=</span>i)
+        <span class="co"># change value</span>
+        queue<span class="op">$</span>producer<span class="op">$</span><span class="kw">fireAssignReactive</span>(<span class="st">&quot;result_val&quot;</span>,result)
+      }
+    })
+
+    <span class="co">#Return something other than the future so we don't block the UI</span>
+    <span class="ot">NULL</span>
+  })
+
+  <span class="co"># set output to reactive value</span>
+  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderTable</span>({
+    <span class="kw">req</span>(<span class="kw">result_val</span>())
+  })
+}
+
+<span class="co"># Run the application</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+</div>
+<div id="adding-a-progress-bar-to-an-async-operation" class="section level3">
+<h3>Adding a progress bar to an async operation</h3>
+<p><code>AsyncProgress</code> is a drop in replacement for Shiny’s <code>Progress</code> class that allows you to update progress bars within a future. The example below shows a minimal example of this. Note how you can click run multiple times and get multiple progress bars.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(future)
+<span class="kw">plan</span>(multiprocess)
+
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+
+  <span class="kw">titlePanel</span>(<span class="st">&quot;Countdown&quot;</span>),
+
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">actionButton</span>(<span class="st">'run'</span>, <span class="st">'Run'</span>)
+    ),
+
+    <span class="kw">mainPanel</span>(
+      <span class="kw">tableOutput</span>(<span class="st">&quot;result&quot;</span>)
+    )
+  )
+)
+
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {
+  
+  <span class="co"># A reactive value to hold output</span>
+  result_val &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>()
+  
+  <span class="co"># Handle button click</span>
+  <span class="kw">observeEvent</span>(input<span class="op">$</span>run,{
+    <span class="kw">result_val</span>(<span class="ot">NULL</span>)
+    
+    <span class="co"># Create a progress bar</span>
+    progress &lt;-<span class="st"> </span>AsyncProgress<span class="op">$</span><span class="kw">new</span>(<span class="dt">message=</span><span class="st">&quot;Complex analysis&quot;</span>)
+    fut &lt;&lt;-<span class="st"> </span><span class="kw">future</span>({
+      <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>){
+        <span class="kw">Sys.sleep</span>(<span class="dv">1</span>)
+        progress<span class="op">$</span><span class="kw">inc</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">10</span>) <span class="co"># Increment progress bar</span>
+      }
+      progress<span class="op">$</span><span class="kw">close</span>() <span class="co"># Close the progress bar</span>
+      <span class="kw">data.frame</span>(<span class="dt">result=</span><span class="st">&quot;Insightful result&quot;</span>)
+    }) <span class="op">%...&gt;%</span><span class="st"> </span>result_val  <span class="co"># Assign result of future to result_val</span>
+
+    <span class="co"># Return something other than the future so we don't block the UI</span>
+    <span class="ot">NULL</span>
+  })
+
+  <span class="co"># Set output to reactive value</span>
+  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderTable</span>({
+    <span class="kw">req</span>(<span class="kw">result_val</span>())
+  })
+}
+
+<span class="co"># Run the application</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+</div>
+<div id="killing-a-long-running-process" class="section level3">
+<h3>Killing a long running process</h3>
+<p>When creating a UI with a process that take a significant amount of times it is critical to provide the user a mechanism to cancel the operation. The recommended way to do this is through the <code>AsyncInterruptor</code> class, which should be used if at all possible.</p>
+<p>There are times where the Shiny developer does not have access to the long running code in such a way that <code>execInterrupts</code> can be called as the computation progresses. In these cases, the only way to terminate a running future is to kill it at the OS level.</p>
+<p>The function <code>stopMulticoreFuture</code> kills a future, provided it is executed in a multicore plan. For mac and linux machines, both plan(multiprocess) and plan(multicore) result in multicore execution plans. In windows it is not possible to use a multicore execution plan.</p>
+<p>The behavior of the execution plan after a kill signal has been sent is technically undefined, but currently there are no large unintended consequences of killing child processes. This may change in the future however, which is why <code>AsyncInterruptor</code> is strongly prefered if at all possible.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(future)
+<span class="kw">library</span>(promises)
+<span class="kw">plan</span>(multicore)    <span class="co"># This will only work with multicore, which is unavailable on Windows</span>
+
+inaccessableAnalysisFunction &lt;-<span class="st"> </span><span class="cf">function</span>(){
+  <span class="kw">Sys.sleep</span>(<span class="dv">10</span>)
+  <span class="kw">data.frame</span>(<span class="dt">result=</span><span class="st">&quot;Insightful analysis&quot;</span>)
+}
+
+<span class="co"># Define UI for application that draws a histogram</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+
+  <span class="co"># Application title</span>
+  <span class="kw">titlePanel</span>(<span class="st">&quot;Cancelable Async Task&quot;</span>),
+
+  <span class="co"># Sidebar with a slider input for number of bins</span>
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">actionButton</span>(<span class="st">'run'</span>, <span class="st">'Run'</span>),
+      <span class="kw">actionButton</span>(<span class="st">'cancel'</span>, <span class="st">'Cancel'</span>)
+    ),
+
+    <span class="co"># Show a plot of the generated distribution</span>
+    <span class="kw">mainPanel</span>(
+      <span class="kw">tableOutput</span>(<span class="st">&quot;result&quot;</span>)
+    )
+  )
+)
+
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {
+
+  fut &lt;-<span class="st"> </span><span class="ot">NULL</span>
+
+  result_val &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>()
+  running &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="ot">FALSE</span>)
+  <span class="kw">observeEvent</span>(input<span class="op">$</span>run,{
+
+    <span class="co">#Don't do anything if in the middle of a run</span>
+    <span class="cf">if</span>(<span class="kw">running</span>())
+      <span class="kw">return</span>(<span class="ot">NULL</span>)
+    <span class="kw">running</span>(<span class="ot">TRUE</span>)
+
+    <span class="kw">print</span>(<span class="st">&quot;Starting Run&quot;</span>)
+    <span class="kw">result_val</span>(<span class="ot">NULL</span>)
+    fut &lt;&lt;-<span class="st"> </span><span class="kw">future</span>({
+      result &lt;-<span class="st"> </span><span class="kw">inaccessableAnalysisFunction</span>()
+    })
+    prom &lt;-<span class="st"> </span>fut <span class="op">%...&gt;%</span><span class="st"> </span>result_val
+    prom &lt;-<span class="st"> </span><span class="kw">catch</span>(fut,
+                 <span class="cf">function</span>(e){
+                   <span class="kw">result_val</span>(<span class="ot">NULL</span>)
+                   <span class="kw">print</span>(e<span class="op">$</span>message)
+                   <span class="kw">showNotification</span>(<span class="st">&quot;Task Stopped&quot;</span>)
+                 })
+    prom &lt;-<span class="st"> </span><span class="kw">finally</span>(prom, <span class="cf">function</span>(){
+      <span class="kw">print</span>(<span class="st">&quot;Done&quot;</span>)
+      <span class="kw">running</span>(<span class="ot">FALSE</span>) <span class="co">#declare done with run</span>
+    })
+
+    <span class="co">#Return something other than the future so we don't block the UI</span>
+    <span class="ot">NULL</span>
+  })
+
+
+  <span class="co"># Kill future</span>
+  <span class="kw">observeEvent</span>(input<span class="op">$</span>cancel,{
+    <span class="co">#</span>
+    <span class="co"># Use this method of stopping only if you don't have access to the</span>
+    <span class="co"># internals of the long running process. If you are able, it is</span>
+    <span class="co"># recommended to use AsyncInterruptor instead.</span>
+    <span class="co">#</span>
+    <span class="kw">stopMulticoreFuture</span>(fut)
+  })
+
+
+  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderTable</span>({
+    <span class="kw">req</span>(<span class="kw">result_val</span>())
+  })
+}
+
+<span class="co"># Run the application</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

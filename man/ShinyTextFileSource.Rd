@@ -3,15 +3,8 @@
 \docType{data}
 \name{ShinyTextFileSource}
 \alias{ShinyTextFileSource}
-\title{Reads and writes the queue to a text file and destroys it on session end}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-ShinyTextFileSource
-}
+\title{Reads and writes to a text file and destroys it on session end}
 \description{
-Reads and writes the queue to a text file and destroys it on session end
-}
-\details{
-A thin wrapper around \code{txtq}
+A wrapper around \code{txtq}.
 }
 \keyword{datasets}

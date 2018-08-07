@@ -16,7 +16,7 @@ stringToObject <- function(strg){
   ".TxTQ",
   inherit=txtq:::R6_txtq,
   public=list(
-    maxRows= 1000,
+    maxRows= 100,
     pop = function(n = 1){
       private$txtq_exclusive({
         result <- private$txtq_pop(n = n)
@@ -43,8 +43,17 @@ stringToObject <- function(strg){
 )
 
 #' Reads and writes the queue to a text file
-#' @details
-#' A thin wrapper around \code{txtq}
+#'
+#' A wrapper around \code{txtq}. This object saves signals
+#' and associated objects to and queue, and retrieves them
+#' for processing.
+#'
+#' @param filePath The path to the file
+#' @param n The number of records to pop (-1 indicates all available).
+#' @param msg A string indicating the signal.
+#' @param obj The object to associate with the signal.
+#' @format NULL
+#' @usage NULL
 #' @export
 TextFileSource <- R6Class(
   "TextFileSource",
@@ -57,12 +66,12 @@ TextFileSource <- R6Class(
 
     initialize = function(filePath=tempFileGenerator()(), ...){
       self$file <- filePath
-      self$q <- .TxTQ$new(self$file)#txtq::txtq(self$file)
+      self$q <- .TxTQ$new(self$file)
     },
 
     pop = function(n=-1){
-      if(self$destroyed)
-        return(list())
+      if(self$isDestroyed())
+        stop("Cannot pop from destroyed TextFileSource")
       l <- self$q$pop(n)
       result <- list()
       if(nrow(l) == 0)
@@ -76,7 +85,7 @@ TextFileSource <- R6Class(
     },
 
     push = function(msg, obj){
-      if(self$destroyed)
+      if(self$isDestroyed())
         stop("Cannot push to a destroyed TextFileSource")
       s <- objectToString(obj)
       self$q$push(msg, s)
@@ -87,14 +96,20 @@ TextFileSource <- R6Class(
         self$destroyed <- TRUE
         self$q$destroy()
       }
+    },
+
+    isDestroyed = function(){
+      self$destroyed || !file.exists(self$file)
     }
   )
 )
 
 
-#' Reads and writes the queue to a text file and destroys it on session end
-#' @details
-#' A thin wrapper around \code{txtq}
+#' Reads and writes to a text file and destroys it on session end
+#'
+#' A wrapper around \code{txtq}.
+#' @format NULL
+#' @usage NULL
 #' @export
 ShinyTextFileSource <- R6Class(
   "ShinyTextFileSource",
@@ -104,7 +119,8 @@ ShinyTextFileSource <- R6Class(
 
     initialize = function(filePath=tempFileGenerator()(),
                           session=shiny::getDefaultReactiveDomain(),...){
-      session$onEnded(self$destroy)
+      if(!is.null(session))
+        session$onEnded(self$destroy)
       super$initialize(filePath)
     }
   )

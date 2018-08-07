@@ -4,11 +4,26 @@
 \name{ShinyProducer}
 \alias{ShinyProducer}
 \title{A Producer with methods specific for Shiny}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-ShinyProducer
-}
 \description{
-A Producer with methods specific for Shiny
+A Producer object with additional methods for firing interrupts, shiny notifications,
+and reactive value assignments.
+}
+\details{
+\strong{Methods}
+  \describe{
+    \item{\code{fireInterrupt(msg="Interrupt")}}{
+      Sends an error with message \code{msg}.
+    }
+    \item{\code{fireNotify(msg="Interrupt")}}{
+      Sends a signal to create a shiy Notifiction with message \code{msg}.
+    }
+    \item{\code{fireAssignReactive(name, value)}}{
+      Signals for assignment for reactive \code{name}  to \code{value}.
+    }
+
+@param msg A string
+    @param name The name of the reactive value.
+    @param value The value to assign the reactive to.
+ }
 }
 \keyword{datasets}

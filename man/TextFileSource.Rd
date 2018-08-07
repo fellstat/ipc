@@ -4,14 +4,18 @@
 \name{TextFileSource}
 \alias{TextFileSource}
 \title{Reads and writes the queue to a text file}
-\format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-TextFileSource
+\arguments{
+\item{filePath}{The path to the file}
+
+\item{n}{The number of records to pop (-1 indicates all available).}
+
+\item{msg}{A string indicating the signal.}
+
+\item{obj}{The object to associate with the signal.}
 }
 \description{
-Reads and writes the queue to a text file
-}
-\details{
-A thin wrapper around \code{txtq}
+A wrapper around \code{txtq}. This object saves signals
+and associated objects to and queue, and retrieves them
+for processing.
 }
 \keyword{datasets}
