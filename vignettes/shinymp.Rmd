@@ -15,7 +15,7 @@ ShinyAsyncTools provides methods for inter-process communication useful when dev
 
 ## Quick Start
 
-Perhaps the most important use of this package is to comminicate with a parent thread from a child thread executed using the `future` package. This is very easy to do. Simply create and start a `Queue` in the parent thread. The child thread can then send messages and evaluate R code on the main thread.
+Perhaps the most important use of this package is to communicate with a parent thread from a child thread executed using the `future` package. This is very easy to do. Simply create and start a `Queue` in the parent thread. The child thread can then send messages and evaluate R code on the main thread.
 
 ```{R echo=TRUE}
 library(ShinyAsyncTools)
@@ -68,13 +68,13 @@ inter$destroy()
 
 ## Use in Shiny
 
-The primary usecase for this package is to support Shiny applications. You can view three example applications using the `shinyExample` function.
+The primary use case for this package is to support Shiny applications. You can view three example applications using the `shinyExample` function.
 
 ### Changing a reactive value from a future
 
 Reactive values can not be changed directly from within a future. Queues make it easy to signal the main thread to assign a reactive value from within the body of a future.
 
-The application below creates a future every time countdown is clicked, which assigns a value to the reactive value every second, counting down from 10 to 0. If you click the button mutliple times, each future will compete to set the value, and the numbers will jump around.
+The application below creates a future every time countdown is clicked, which assigns a value to the reactive value every second, counting down from 10 to 0. If you click the button multiple times, each future will compete to set the value, and the numbers will jump around.
 
 ```{R, eval=FALSE}
 library(shiny)
@@ -199,7 +199,7 @@ There are times where the Shiny developer does not have access to the long runni
 
 The function `stopMulticoreFuture` kills a future, provided it is executed in a multicore plan. For mac and linux machines, both plan(multiprocess) and plan(multicore) result in multicore execution plans. In windows it is not possible to use a multicore execution plan.
 
-The behavior of the execution plan after a kill signal has been sent is technically undefined, but currently there are no large unintended consequences of killing child processes. This may change in the future however, which is why `AsyncInterruptor` is strongly prefered if at all possible.
+The behavior of the execution plan after a kill signal has been sent is technically undefined, but currently there are no large unintended consequences of killing child processes. This may change in the future however, which is why `AsyncInterruptor` is strongly preferred if at all possible.
 
 
 ```{R eval=FALSE}
