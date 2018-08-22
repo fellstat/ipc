@@ -15,6 +15,8 @@ shinyQueue(source = defaultSource()$new(),
 \item{producer}{The producer for the source}
 
 \item{consumer}{The consumer of the source}
+
+\item{session}{A Shiny session}
 }
 \description{
 Create a Queue object

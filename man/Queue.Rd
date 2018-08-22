@@ -2,6 +2,7 @@
 % Please edit documentation in R/queue.R
 \name{queue}
 \alias{queue}
+\alias{Queue}
 \title{Create a Queue object}
 \usage{
 queue(source = defaultSource()$new(), producer = Producer$new(source),

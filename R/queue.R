@@ -1,4 +1,5 @@
 #' A Class containing a producer and consumer
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
@@ -32,6 +33,7 @@ Queue <- R6Class(
 #' @param source The source for reading and writing the queue
 #' @param producer The producer for the source
 #' @param consumer The consumer of the source
+#' @aliases Queue
 #' @export
 queue  <- function(source = defaultSource()$new(),
                         producer = Producer$new(source),
@@ -44,6 +46,7 @@ queue  <- function(source = defaultSource()$new(),
 #' @param source The source for reading and writing the queue
 #' @param producer The producer for the source
 #' @param consumer The consumer of the source
+#' @param session A Shiny session
 #' @details
 #' Creates a Queue object for use with shiny, backed by
 #' ShinyTextSource, ShiyProducer and ShinyConsumer objects
