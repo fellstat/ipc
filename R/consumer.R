@@ -27,8 +27,11 @@
 #'     \item{\code{clearHandlers()}}{
 #'       Removes all handlers
 #'     }
-#'     \item{\code{removeHandler(signal, index)()}}{
+#'     \item{\code{removeHandler(signal, index)}}{
 #'       Removes handler from 'signal' with position index
+#'     }
+#'     \item{\code{addHandler(func, signal)}}{
+#'       Adds a handler for 'signal'. func should take three parameters: 1. the signal, 2. the message object, and 3. the evaluation environment.
 #'     }
 #'     \item{\code{initHandlers()}}{
 #'       Adds the two default executeors.
@@ -51,18 +54,17 @@ Consumer <- R6Class(
   "Consumer",
   private = list(
     source=NULL,
-    env = NULL,
 
     addEvalHandler = function(){
-      func <- function(signal, obj){
-        eval(obj, env=private$env)
+      func <- function(signal, obj, env){
+        eval(obj, envir = env)
       }
       self$addHandler(func, "eval")
     },
 
     addfunctionHandler = function(){
-      func <- function(signal, obj){
-        f <- get(obj[[1]], envir = private$env)
+      func <- function(signal, obj, env){
+        f <- get(obj[[1]], envir = env)
         do.call(f, obj[[2]])
       }
       self$addHandler(func, "function")
@@ -89,7 +91,6 @@ Consumer <- R6Class(
     },
 
     consume = function(throwErrors=TRUE, env=parent.frame()){
-      private$env <- env
       contents <- private$source$pop()
       if(length(contents) == 0)
         return(list())
@@ -101,7 +102,7 @@ Consumer <- R6Class(
         if(!is.null(exec)){
           for(j in 1:length(exec)){
             func <- exec[[j]]
-            result[[i]][[j]] <- try(func(signals[i], contents[[i]]))
+            result[[i]][[j]] <- try(func(signals[i], contents[[i]], env))
           }
         }else
           warning(paste("No handler for signal", signals[i]))

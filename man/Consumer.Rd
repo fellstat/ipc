@@ -43,8 +43,11 @@
     \item{\code{clearHandlers()}}{
       Removes all handlers
     }
-    \item{\code{removeHandler(signal, index)()}}{
+    \item{\code{removeHandler(signal, index)}}{
       Removes handler from 'signal' with position index
+    }
+    \item{\code{addHandler(func, signal)}}{
+      Adds a handler for 'signal'. func should take three parameters: 1. the signal, 2. the message object, and 3. the evaluation environment.
     }
     \item{\code{initHandlers()}}{
       Adds the two default executeors.
