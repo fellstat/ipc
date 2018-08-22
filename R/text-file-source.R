@@ -1,13 +1,12 @@
 objectToString <- function(obj){
-  on.exit(function() close(con))
+  on.exit(close(con))
   con <- textConnection(NULL,"w")
   saveRDS(obj, con, ascii = TRUE)
   paste0(textConnectionValue(con), collapse="\n")
 }
 
 stringToObject <- function(strg){
-  on.exit(function() close(con))
-  #value <- NULL
+  on.exit(close(con))
   con <- textConnection(strg,"r")
   readRDS(con)
 }
@@ -57,22 +56,24 @@ stringToObject <- function(strg){
 #' @export
 TextFileSource <- R6Class(
   "TextFileSource",
-  public = list(
+  private = list(
     file = NULL,
 
     q = NULL,
 
-    destroyed = FALSE,
+    destroyed = FALSE
+  ),
+  public = list(
 
-    initialize = function(filePath=tempFileGenerator()(), ...){
-      self$file <- filePath
-      self$q <- .TxTQ$new(self$file)
+    initialize = function(filePath=tempFileGenerator()()){
+      private$file <- filePath
+      private$q <- .TxTQ$new(private$file)
     },
 
     pop = function(n=-1){
       if(self$isDestroyed())
         stop("Cannot pop from destroyed TextFileSource")
-      l <- self$q$pop(n)
+      l <- private$q$pop(n)
       result <- list()
       if(nrow(l) == 0)
         return(list())
@@ -88,40 +89,20 @@ TextFileSource <- R6Class(
       if(self$isDestroyed())
         stop("Cannot push to a destroyed TextFileSource")
       s <- objectToString(obj)
-      self$q$push(msg, s)
+      private$q$push(msg, s)
     },
 
     destroy = function(){
-      if(!self$destroyed){
-        self$destroyed <- TRUE
-        self$q$destroy()
+      if(!private$destroyed){
+        private$destroyed <- TRUE
+        private$q$destroy()
       }
     },
 
     isDestroyed = function(){
-      self$destroyed || !file.exists(self$file)
+      private$destroyed || !file.exists(private$file)
     }
   )
 )
 
 
-#' Reads and writes to a text file and destroys it on session end
-#'
-#' A wrapper around \code{txtq}.
-#' @format NULL
-#' @usage NULL
-#' @export
-ShinyTextFileSource <- R6Class(
-  "ShinyTextFileSource",
-  inherit=TextFileSource,
-  public = list(
-    session = NULL,
-
-    initialize = function(filePath=tempFileGenerator()(),
-                          session=shiny::getDefaultReactiveDomain(),...){
-      if(!is.null(session))
-        session$onEnded(self$destroy)
-      super$initialize(filePath)
-    }
-  )
-)

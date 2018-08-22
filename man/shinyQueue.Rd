@@ -6,7 +6,8 @@
 \usage{
 shinyQueue(source = defaultSource()$new(),
   producer = ShinyProducer$new(source),
-  consumer = ShinyConsumer$new(source))
+  consumer = ShinyConsumer$new(source),
+  session = shiny::getDefaultReactiveDomain())
 }
 \arguments{
 \item{source}{The source for reading and writing the queue}
@@ -17,4 +18,10 @@ shinyQueue(source = defaultSource()$new(),
 }
 \description{
 Create a Queue object
+}
+\details{
+Creates a Queue object for use with shiny, backed by
+ShinyTextSource, ShiyProducer and ShinyConsumer objects
+by default. The object will be cleaned up and destroyed on
+session end.
 }

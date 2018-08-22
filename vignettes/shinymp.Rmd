@@ -1,5 +1,5 @@
 ---
-title: "Tools for Asynchronous Processing with Shiny"
+title: "Tools for Inter-Process Communication"
 author: "Ian Fellows"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -21,7 +21,7 @@ Perhaps the most important use of this package is to communicate with a parent t
 library(ShinyAsyncTools)
 library(future)
 plan(multiprocess)
-q <- shinyQueue()
+q <- queue()
 
 value <- ""
 
@@ -45,30 +45,62 @@ q$destroy()
 A `Queue` object has a `producer` field that is used to send signals onto the `Queue` and a `consumer` field that is used to read from the queue, and process any signals written to the `Queue`.
 
 
-### Interrupting a long running process
+### Signaling a child process
 
-Signals can also be sent from the main thread to a child. In Shiny, a typical use case for this is to send interrupts to long running child processes. `ShinyAsyncTools` has a simple wrapper class that make this very easy `AsyncInterruptor`.
+Signals can also be sent from the main thread to a child. Here we will cause the child process to throw an error.
 
 ```{R echo=TRUE}
 library(future)
 library(promises)
 plan(multiprocess)
-inter <- AsyncInterruptor$new()
+
+q <- queue()
+
 fut <- future({
   for(i in 1:1000){
     Sys.sleep(.1)
-    inter$execInterrupts()
+    q$consumer$consume()
  }
 })
-inter$interrupt("Error: Stop Future")
+
+q$producer$fireEval(stop("Stop that child"))
 cat(try(value(fut)))
-inter$destroy()
+
+q$destroy()
+```
+
+If errors occur during the consumption, all messages are processed, and then the first error encountered is then thrown. Alternatively, errors can be switched to warnings using `q$consumer$consume(throwErrors=FALSE)`.
+
+### Continuous consumption
+
+A consumer's `start` method can be used to execute `comsume` at regular intervals (provided the R process is idle).
+
+```{r eval=FALSE}
+library(future)
+library(promises)
+plan(multiprocess)
+
+q <- queue()
+
+fut <- future({
+  for(i in 1:100){
+    Sys.sleep(.1)
+    q$producer$fireEval(print(index), list(index=i))
+ }
+})
+
+q$consumer$start()
+
+# ... Later, stop consumption and clean up
+# q$destroy()
 ```
 
 
 ## Use in Shiny
 
-The primary use case for this package is to support Shiny applications. You can view three example applications using the `shinyExample` function.
+A major use case for this package is to support Shiny applications. You can view three example applications using the `shinyExample` function. Taking advantage of inter-process communication allows for more dynamic applications that are more responsive to the user.
+
+In Shiny apps, it is recommended that queues be created with the `shinyQueue` function. This will ensure that the queue is properly destroyed on session end.
 
 ### Changing a reactive value from a future
 
@@ -193,7 +225,33 @@ shinyApp(ui = ui, server = server)
 
 ### Killing a long running process
 
-When creating a UI with a process that take a significant amount of times it is critical to provide the user a mechanism to cancel the operation. The recommended way to do this is through the `AsyncInterruptor` class, which should be used if at all possible.
+When creating a UI with a process that take a significant amount of times it is critical to provide the user a mechanism to cancel the operation. The recommended mechanism to do this is to send a kill message. The `AsyncInterruptor` is an easy to use wrapper around a `Queue` object for this common use case.
+
+```{R echo=TRUE}
+library(future)
+library(promises)
+plan(multiprocess)
+
+# A long running function. Having a callback (progressMonitor) is a way to
+# allow for interrupts to be checked for without adding a dependency
+# to the analysis function.
+accessableAnalysisFunction <- function(progressMonitor=function(i) cat(".")){
+  for(i in 1:1000){
+    Sys.sleep(.1)
+    progressMonitor(i)
+  }
+  data.frame(result="Insightful analysis")
+}
+
+inter <- AsyncInterruptor$new()
+fut <- future({
+  accessableAnalysisFunction(progressMonitor = function(i) inter$execInterrupts())
+})
+inter$interrupt("Error: Stop Future")
+cat(try(value(fut)))
+inter$destroy()
+```
+
 
 There are times where the Shiny developer does not have access to the long running code in such a way that `execInterrupts` can be called as the computation progresses. In these cases, the only way to terminate a running future is to kill it at the OS level.
 

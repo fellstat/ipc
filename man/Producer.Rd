@@ -7,8 +7,14 @@
 \description{
 \strong{Methods}
   \describe{
-    \item{\code{initialize(source, ...)}}{
+    \item{\code{initialize(source)}}{
       Creates a Producer object linked to the \code{source}.
+    }
+    \item{\code{setSource(source)}}{
+      Sets the \code{Source} for this producer.
+    }
+    \item{\code{getSource(source)}}{
+      Gets the \code{Source} of this producer.
     }
     \item{\code{fire(signal, obj=NA)}}{
       Sends a signal to the source with associates object \code{obj}.

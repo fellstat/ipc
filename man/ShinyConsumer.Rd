@@ -3,7 +3,7 @@
 \docType{data}
 \name{ShinyConsumer}
 \alias{ShinyConsumer}
-\title{A Consumer class with common task executors useful in Shiny apps}
+\title{A Consumer class with common task handlers useful in Shiny apps}
 \description{
 In addtion to 'eval' and 'function' signals, ShinyConsumer object
 process 'interrupt' and 'notify' signals for throwing errors and

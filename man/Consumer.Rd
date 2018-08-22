@@ -18,29 +18,35 @@
 \description{
 \strong{Methods}
   \describe{
-    \item{\code{initialize(source, env=parent.frame(2), ...)}}{
-      Creates a Consumer object linked to the \code{source}. Signals will be
-      executed in the \code{env} environment.
+    \item{\code{initialize(source, env=parent.frame(2))}}{
+      Creates a Consumer object linked to the \code{source}.
     }
-    \item{\code{consume(safe=FALSE, env=parent.frame())}}{
+    \item{\code{setSource(source)}}{
+      Sets the \code{Source} for this consumer.
+    }
+    \item{\code{getSource(source)}}{
+      Gets the \code{Source} of this consumer.
+    }
+    \item{\code{consume(throwErrors=TRUE, env=parent.frame())}}{
       Executes all (unprocessed) signals fired to source from a Producer.
-      if \code{safe} evaluation is wrapped with \code{try}. Signals are
-      executed in the \code{env} environment.
+      if \code{throwErrors} is TRUE, the first error encountered is thrown
+      after executing all signals. Signals are executed in the \code{env} environment.
+      If \code{env} is NULL, the enviroment set at initialization is used.
     }
-    \item{\code{start(millis=250, env=parent.frame())}}{
-      Starts executing \code{consume} every \code{millis} milliseconds. Signals are
-      executed in the \code{env} environment.
+    \item{\code{start(millis=250, throwErrors=TRUE, env=parent.frame())}}{
+      Starts executing \code{consume} every \code{millis} milliseconds. \code{throwErrors}
+      and \code{env} are passed down to \code{consume}
     }
     \item{\code{stop()}}{
       Stops the periodic execution of \code{consume}.
     }
-    \item{\code{clearExecutors()}}{
-      Removes all executors
+    \item{\code{clearHandlers()}}{
+      Removes all handlers
     }
-    \item{\code{removeExecutor(signal, index)()}}{
-      Removes executor from 'signal' with position index
+    \item{\code{removeHandler(signal, index)()}}{
+      Removes handler from 'signal' with position index
     }
-    \item{\code{initExecutors()}}{
+    \item{\code{initHandlers()}}{
       Adds the two default executeors.
     }
     \item{\code{finalize()}}{

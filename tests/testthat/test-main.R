@@ -18,8 +18,11 @@ test_that("Main", {
 
 
   # Test evaluation
+  a <- 3
   prod$fireEval(stop("testerror", call.=FALSE))
+  prod$fireEval(a <- 2)
   expect_error(cons$consume())
+  expect_true(a == 2)
 
   b <- 1
   prod$fireEval(b <- 2)

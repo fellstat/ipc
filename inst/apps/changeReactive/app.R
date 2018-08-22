@@ -47,7 +47,7 @@ server <- function(input, output) {
       cols <- c(rainbow(10), "grey")
       for(i in 1:11){
         Sys.sleep(1)
-        #queue$producer$fireNotify(paste("Changing color to", cols[i]))
+        queue$producer$fireNotify(paste("Changing color to", cols[i]))
         queue$producer$fireAssignReactive("color", cols[i])
       }
     })

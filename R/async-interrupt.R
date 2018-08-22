@@ -61,7 +61,7 @@ AsyncInterruptor <- R6Class(
     },
 
     getInterrupts = function(){
-      private$queue$consumer$consume(safe=TRUE)
+      private$queue$consumer$consume(throwErrors=FALSE)
     },
 
     destroy = function(){

@@ -12,9 +12,9 @@
 
 <meta name="author" content="Ian Fellows" />
 
-<meta name="date" content="2018-08-07" />
+<meta name="date" content="2018-08-22" />
 
-<title>Tools for Asynchronous Processing with Shiny</title>
+<title>Tools for Inter-Process Communication</title>
 
 
 
@@ -68,9 +68,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">Tools for Asynchronous Processing with Shiny</h1>
+<h1 class="title toc-ignore">Tools for Inter-Process Communication</h1>
 <h4 class="author"><em>Ian Fellows</em></h4>
-<h4 class="date"><em>2018-08-07</em></h4>
+<h4 class="date"><em>2018-08-22</em></h4>
 
 
 
@@ -84,7 +84,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ShinyAsyncTools)
 <span class="kw">library</span>(future)
 <span class="kw">plan</span>(multiprocess)
-q &lt;-<span class="st"> </span><span class="kw">shinyQueue</span>()
+q &lt;-<span class="st"> </span><span class="kw">queue</span>()
 
 value &lt;-<span class="st"> &quot;&quot;</span>
 
@@ -103,28 +103,54 @@ cons &lt;-<span class="st"> </span>q<span class="op">$</span>consumer<span class
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Remove temporary files</span>
 q<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <p>A <code>Queue</code> object has a <code>producer</code> field that is used to send signals onto the <code>Queue</code> and a <code>consumer</code> field that is used to read from the queue, and process any signals written to the <code>Queue</code>.</p>
-<div id="interrupting-a-long-running-process" class="section level3">
-<h3>Interrupting a long running process</h3>
-<p>Signals can also be sent from the main thread to a child. In Shiny, a typical use case for this is to send interrupts to long running child processes. <code>ShinyAsyncTools</code> has a simple wrapper class that make this very easy <code>AsyncInterruptor</code>.</p>
+<div id="signaling-a-child-process" class="section level3">
+<h3>Signaling a child process</h3>
+<p>Signals can also be sent from the main thread to a child. Here we will cause the child process to throw an error.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
 <span class="kw">library</span>(promises)
 <span class="kw">plan</span>(multiprocess)
-inter &lt;-<span class="st"> </span>AsyncInterruptor<span class="op">$</span><span class="kw">new</span>()
+
+q &lt;-<span class="st"> </span><span class="kw">queue</span>()
+
 fut &lt;-<span class="st"> </span><span class="kw">future</span>({
   <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>){
     <span class="kw">Sys.sleep</span>(.<span class="dv">1</span>)
-    inter<span class="op">$</span><span class="kw">execInterrupts</span>()
+    q<span class="op">$</span>consumer<span class="op">$</span><span class="kw">consume</span>()
  }
 })
-inter<span class="op">$</span><span class="kw">interrupt</span>(<span class="st">&quot;Error: Stop Future&quot;</span>)
+
+q<span class="op">$</span>producer<span class="op">$</span><span class="kw">fireEval</span>(<span class="kw">stop</span>(<span class="st">&quot;Stop that child&quot;</span>))
 <span class="kw">cat</span>(<span class="kw">try</span>(<span class="kw">value</span>(fut)))</code></pre></div>
-<pre><code>## Error in func(signals[i], contents[[i]]) : Error: Stop Future</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">inter<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
+<pre><code>## Error in eval(obj, env = private$env) : Stop that child</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">q<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
+<p>If errors occur during the consumption, all messages are processed, and then the first error encountered is then thrown. Alternatively, errors can be switched to warnings using <code>q$consumer$consume(throwErrors=FALSE)</code>.</p>
+</div>
+<div id="continuous-consumption" class="section level3">
+<h3>Continuous consumption</h3>
+<p>A consumer’s <code>start</code> method can be used to execute <code>comsume</code> at regular intervals (provided the R process is idle).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
+<span class="kw">library</span>(promises)
+<span class="kw">plan</span>(multiprocess)
+
+q &lt;-<span class="st"> </span><span class="kw">queue</span>()
+
+fut &lt;-<span class="st"> </span><span class="kw">future</span>({
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">100</span>){
+    <span class="kw">Sys.sleep</span>(.<span class="dv">1</span>)
+    q<span class="op">$</span>producer<span class="op">$</span><span class="kw">fireEval</span>(<span class="kw">print</span>(index), <span class="kw">list</span>(<span class="dt">index=</span>i))
+ }
+})
+
+q<span class="op">$</span>consumer<span class="op">$</span><span class="kw">start</span>()
+
+<span class="co"># ... Later, stop consumption and clean up</span>
+<span class="co"># q$destroy()</span></code></pre></div>
 </div>
 </div>
 <div id="use-in-shiny" class="section level2">
 <h2>Use in Shiny</h2>
-<p>The primary use case for this package is to support Shiny applications. You can view three example applications using the <code>shinyExample</code> function.</p>
+<p>A major use case for this package is to support Shiny applications. You can view three example applications using the <code>shinyExample</code> function. Taking advantage of inter-process communication allows for more dynamic applications that are more responsive to the user.</p>
+<p>In Shiny apps, it is recommended that queues be created with the <code>shinyQueue</code> function. This will ensure that the queue is properly destroyed on session end.</p>
 <div id="changing-a-reactive-value-from-a-future" class="section level3">
 <h3>Changing a reactive value from a future</h3>
 <p>Reactive values can not be changed directly from within a future. Queues make it easy to signal the main thread to assign a reactive value from within the body of a future.</p>
@@ -239,7 +265,30 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 </div>
 <div id="killing-a-long-running-process" class="section level3">
 <h3>Killing a long running process</h3>
-<p>When creating a UI with a process that take a significant amount of times it is critical to provide the user a mechanism to cancel the operation. The recommended way to do this is through the <code>AsyncInterruptor</code> class, which should be used if at all possible.</p>
+<p>When creating a UI with a process that take a significant amount of times it is critical to provide the user a mechanism to cancel the operation. The recommended mechanism to do this is to send a kill message. The <code>AsyncInterruptor</code> is an easy to use wrapper around a <code>Queue</code> object for this common use case.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
+<span class="kw">library</span>(promises)
+<span class="kw">plan</span>(multiprocess)
+
+<span class="co"># A long running function. Having a callback (progressMonitor) is a way to</span>
+<span class="co"># allow for interrupts to be checked for without adding a dependency</span>
+<span class="co"># to the analysis function.</span>
+accessableAnalysisFunction &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">progressMonitor=</span><span class="cf">function</span>(i) <span class="kw">cat</span>(<span class="st">&quot;.&quot;</span>)){
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>){
+    <span class="kw">Sys.sleep</span>(.<span class="dv">1</span>)
+    <span class="kw">progressMonitor</span>(i)
+  }
+  <span class="kw">data.frame</span>(<span class="dt">result=</span><span class="st">&quot;Insightful analysis&quot;</span>)
+}
+
+inter &lt;-<span class="st"> </span>AsyncInterruptor<span class="op">$</span><span class="kw">new</span>()
+fut &lt;-<span class="st"> </span><span class="kw">future</span>({
+  <span class="kw">accessableAnalysisFunction</span>(<span class="dt">progressMonitor =</span> <span class="cf">function</span>(i) inter<span class="op">$</span><span class="kw">execInterrupts</span>())
+})
+inter<span class="op">$</span><span class="kw">interrupt</span>(<span class="st">&quot;Error: Stop Future&quot;</span>)
+<span class="kw">cat</span>(<span class="kw">try</span>(<span class="kw">value</span>(fut)))</code></pre></div>
+<pre><code>## Error in func(signals[i], contents[[i]]) : Error: Stop Future</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">inter<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <p>There are times where the Shiny developer does not have access to the long running code in such a way that <code>execInterrupts</code> can be called as the computation progresses. In these cases, the only way to terminate a running future is to kill it at the OS level.</p>
 <p>The function <code>stopMulticoreFuture</code> kills a future, provided it is executed in a multicore plan. For mac and linux machines, both plan(multiprocess) and plan(multicore) result in multicore execution plans. In windows it is not possible to use a multicore execution plan.</p>
 <p>The behavior of the execution plan after a kill signal has been sent is technically undefined, but currently there are no large unintended consequences of killing child processes. This may change in the future however, which is why <code>AsyncInterruptor</code> is strongly preferred if at all possible.</p>

@@ -1,3 +1,3 @@
 .globals$tempfile <- tempfile
 
-.globals$defaultSource <- ShinyTextFileSource
+.globals$defaultSource <- TextFileSource

@@ -2,7 +2,7 @@
 library(ShinyAsyncTools)
 library(future)
 plan(multiprocess)
-q <- shinyQueue()
+q <- queue()
 
 value <- ""
 
@@ -26,16 +26,39 @@ q$destroy()
 library(future)
 library(promises)
 plan(multiprocess)
-inter <- AsyncInterruptor$new()
+
+q <- queue()
+
 fut <- future({
   for(i in 1:1000){
     Sys.sleep(.1)
-    inter$execInterrupts()
+    q$consumer$consume()
  }
 })
-inter$interrupt("Error: Stop Future")
+
+q$producer$fireEval(stop("Stop that child"))
 cat(try(value(fut)))
-inter$destroy()
+
+q$destroy()
+
+## ----eval=FALSE----------------------------------------------------------
+#  library(future)
+#  library(promises)
+#  plan(multiprocess)
+#  
+#  q <- queue()
+#  
+#  fut <- future({
+#    for(i in 1:100){
+#      Sys.sleep(.1)
+#      q$producer$fireEval(print(index), list(index=i))
+#   }
+#  })
+#  
+#  q$consumer$start()
+#  
+#  # ... Later, stop consumption and clean up
+#  # q$destroy()
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  library(shiny)
@@ -143,6 +166,30 @@ inter$destroy()
 #  
 #  # Run the application
 #  shinyApp(ui = ui, server = server)
+
+## ----echo=TRUE-----------------------------------------------------------
+library(future)
+library(promises)
+plan(multiprocess)
+
+# A long running function. Having a callback (progressMonitor) is a way to
+# allow for interrupts to be checked for without adding a dependency
+# to the analysis function.
+accessableAnalysisFunction <- function(progressMonitor=function(i) cat(".")){
+  for(i in 1:1000){
+    Sys.sleep(.1)
+    progressMonitor(i)
+  }
+  data.frame(result="Insightful analysis")
+}
+
+inter <- AsyncInterruptor$new()
+fut <- future({
+  accessableAnalysisFunction(progressMonitor = function(i) inter$execInterrupts())
+})
+inter$interrupt("Error: Stop Future")
+cat(try(value(fut)))
+inter$destroy()
 
 ## ----eval=FALSE----------------------------------------------------------
 #  library(shiny)
