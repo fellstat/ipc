@@ -123,10 +123,14 @@ Consumer <- R6Class(
 
     start = function(millis=250, throwErrors=TRUE, env=parent.frame()){
       self$stopped <- FALSE
+
+      # Needed otherwise env changes every callback
+      envir <- env
+
       callback <- function(){
         if (self$stopped) return()
         tryCatch({
-          result <- self$consume(throwErrors=throwErrors, env=env)
+          result <- self$consume(throwErrors=throwErrors, env=envir)
           if(!is.null(result)){
             for( i in seq_along(result)){
               for(j in seq_along(result[[i]])){
@@ -190,7 +194,7 @@ ShinyConsumer <- R6Class(
   inherit=Consumer,
   private = list(
     addInterruptHandler = function(){
-      func <- function(signal, obj){
+      func <- function(signal, obj, env){
         if(is.null(obj))
           msg <- "Triggered Inturrupt"
         else{
@@ -206,7 +210,7 @@ ShinyConsumer <- R6Class(
 
     addNotifyHandler = function(){
       session <- shiny::getDefaultReactiveDomain()
-      func <- function(signal, obj){
+      func <- function(signal, obj, env){
         if(is.null(obj))
           msg <- list(ui="")
         else if(is.character(obj)){
