@@ -1,5 +1,5 @@
 library(shiny)
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 plan(multiprocess)
 

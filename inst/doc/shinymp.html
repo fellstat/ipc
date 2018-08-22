@@ -76,14 +76,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>ShinyAsyncTools provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.</p>
+<p>ipc provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.</p>
 </div>
 <div id="quick-start" class="section level2">
 <h2>Quick Start</h2>
 <p>Perhaps the most important use of this package is to communicate with a parent thread from a child thread executed using the <code>future</code> package. This is very easy to do. Simply create and start a <code>Queue</code> in the parent thread. The child thread can then send messages and evaluate R code on the main thread.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ShinyAsyncTools)
-<span class="kw">library</span>(future)
-<span class="kw">plan</span>(multiprocess)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ipc)
+<span class="kw">library</span>(future)</code></pre></div>
+<pre><code>## Warning: package 'future' was built under R version 3.4.4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan</span>(multiprocess)
 q &lt;-<span class="st"> </span><span class="kw">queue</span>()
 
 value &lt;-<span class="st"> &quot;&quot;</span>
@@ -107,8 +108,9 @@ q<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <h3>Signaling a child process</h3>
 <p>Signals can also be sent from the main thread to a child. Here we will cause the child process to throw an error.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
-<span class="kw">library</span>(promises)
-<span class="kw">plan</span>(multiprocess)
+<span class="kw">library</span>(promises)</code></pre></div>
+<pre><code>## Warning: package 'promises' was built under R version 3.4.4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan</span>(multiprocess)
 
 q &lt;-<span class="st"> </span><span class="kw">queue</span>()
 
@@ -121,7 +123,7 @@ fut &lt;-<span class="st"> </span><span class="kw">future</span>({
 
 q<span class="op">$</span>producer<span class="op">$</span><span class="kw">fireEval</span>(<span class="kw">stop</span>(<span class="st">&quot;Stop that child&quot;</span>))
 <span class="kw">cat</span>(<span class="kw">try</span>(<span class="kw">value</span>(fut)))</code></pre></div>
-<pre><code>## Error in eval(obj, env = private$env) : Stop that child</code></pre>
+<pre><code>## Error in eval(obj, envir = env) : Stop that child</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">q<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <p>If errors occur during the consumption, all messages are processed, and then the first error encountered is then thrown. Alternatively, errors can be switched to warnings using <code>q$consumer$consume(throwErrors=FALSE)</code>.</p>
 </div>
@@ -156,7 +158,7 @@ q<span class="op">$</span>consumer<span class="op">$</span><span class="kw">star
 <p>Reactive values can not be changed directly from within a future. Queues make it easy to signal the main thread to assign a reactive value from within the body of a future.</p>
 <p>The application below creates a future every time countdown is clicked, which assigns a value to the reactive value every second, counting down from 10 to 0. If you click the button multiple times, each future will compete to set the value, and the numbers will jump around.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
-<span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(ipc)
 <span class="kw">library</span>(future)
 <span class="kw">plan</span>(multiprocess)
 
@@ -211,7 +213,7 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 <h3>Adding a progress bar to an async operation</h3>
 <p><code>AsyncProgress</code> is a drop in replacement for Shiny’s <code>Progress</code> class that allows you to update progress bars within a future. The example below shows a minimal example of this. Note how you can click run multiple times and get multiple progress bars.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
-<span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(ipc)
 <span class="kw">library</span>(future)
 <span class="kw">plan</span>(multiprocess)
 
@@ -287,13 +289,13 @@ fut &lt;-<span class="st"> </span><span class="kw">future</span>({
 })
 inter<span class="op">$</span><span class="kw">interrupt</span>(<span class="st">&quot;Error: Stop Future&quot;</span>)
 <span class="kw">cat</span>(<span class="kw">try</span>(<span class="kw">value</span>(fut)))</code></pre></div>
-<pre><code>## Error in func(signals[i], contents[[i]]) : Error: Stop Future</code></pre>
+<pre><code>## Error in func(signals[i], contents[[i]], env) : unused argument (env)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">inter<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <p>There are times where the Shiny developer does not have access to the long running code in such a way that <code>execInterrupts</code> can be called as the computation progresses. In these cases, the only way to terminate a running future is to kill it at the OS level.</p>
 <p>The function <code>stopMulticoreFuture</code> kills a future, provided it is executed in a multicore plan. For mac and linux machines, both plan(multiprocess) and plan(multicore) result in multicore execution plans. In windows it is not possible to use a multicore execution plan.</p>
 <p>The behavior of the execution plan after a kill signal has been sent is technically undefined, but currently there are no large unintended consequences of killing child processes. This may change in the future however, which is why <code>AsyncInterruptor</code> is strongly preferred if at all possible.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
-<span class="kw">library</span>(ShinyAsyncTools)
+<span class="kw">library</span>(ipc)
 <span class="kw">library</span>(future)
 <span class="kw">library</span>(promises)
 <span class="kw">plan</span>(multicore)    <span class="co"># This will only work with multicore, which is unavailable on Windows</span>

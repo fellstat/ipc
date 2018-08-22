@@ -62,7 +62,7 @@ test_that("Main", {
   expect_true(b == 3)
 
   # Test file truncation
-  tq <- ShinyAsyncTools:::.TxTQ$new(tempfile())
+  tq <- ipc:::.TxTQ$new(tempfile())
   tq$mr(7) #maxRows <- 7
   for(i in 1:5){
     tq$push("test",as.character(i))

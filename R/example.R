@@ -7,9 +7,9 @@
 #' @export
 shinyExample <- function(application=c("progress","changeReactive", "cancel")) {
   application <- match.arg(application)
-  appDir <- system.file("apps", application, package = "ShinyAsyncTools")
+  appDir <- system.file("apps", application, package = "ipc")
   if (appDir == "") {
-    stop("Could not find example directory. Try re-installing `ShinyAsyncTools`.", call. = FALSE)
+    stop("Could not find example directory. Try re-installing `ipc`.", call. = FALSE)
   }
 
   shiny::runApp(appDir, display.mode = "normal")

@@ -4,21 +4,21 @@ author: "Ian Fellows"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to ShinyAsyncTools}
+  %\VignetteIndexEntry{Introduction to ipc}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ## Introduction
 
-ShinyAsyncTools provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.
+ipc provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.
 
 ## Quick Start
 
 Perhaps the most important use of this package is to communicate with a parent thread from a child thread executed using the `future` package. This is very easy to do. Simply create and start a `Queue` in the parent thread. The child thread can then send messages and evaluate R code on the main thread.
 
 ```{R echo=TRUE}
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 plan(multiprocess)
 q <- queue()
@@ -110,7 +110,7 @@ The application below creates a future every time countdown is clicked, which as
 
 ```{R, eval=FALSE}
 library(shiny)
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 plan(multiprocess)
 
@@ -169,7 +169,7 @@ shinyApp(ui = ui, server = server)
 
 ```{R, eval=FALSE}
 library(shiny)
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 plan(multiprocess)
 
@@ -262,7 +262,7 @@ The behavior of the execution plan after a kill signal has been sent is technica
 
 ```{R eval=FALSE}
 library(shiny)
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 library(promises)
 plan(multicore)    # This will only work with multicore, which is unavailable on Windows

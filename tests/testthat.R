@@ -1,4 +1,4 @@
 library(testthat)
-library(ShinyAsyncTools)
+library(ipc)
 
-test_check("ShinyAsyncTools")
+test_check("ipc")

@@ -1,5 +1,5 @@
 ## ----echo=TRUE-----------------------------------------------------------
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 plan(multiprocess)
 q <- queue()
@@ -62,7 +62,7 @@ q$destroy()
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  library(shiny)
-#  library(ShinyAsyncTools)
+#  library(ipc)
 #  library(future)
 #  plan(multiprocess)
 #  
@@ -115,7 +115,7 @@ q$destroy()
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  library(shiny)
-#  library(ShinyAsyncTools)
+#  library(ipc)
 #  library(future)
 #  plan(multiprocess)
 #  
@@ -193,7 +193,7 @@ inter$destroy()
 
 ## ----eval=FALSE----------------------------------------------------------
 #  library(shiny)
-#  library(ShinyAsyncTools)
+#  library(ipc)
 #  library(future)
 #  library(promises)
 #  plan(multicore)    # This will only work with multicore, which is unavailable on Windows

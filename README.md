@@ -1,4 +1,4 @@
-# ShinyAsyncTools
+# ipc
 
 This package provides tools that let you update a shiny UI from within a child process (e.g. future). Examples are provided showing how to perform useful tasks such as: updating reactive values from within future, progress bars for long running async tasks, and interrupting async tasks based on user input.
 
@@ -9,16 +9,16 @@ To install the latest development version from the github repo run:
 # If devtools is not installed:
 # install.packages("devtools")
 
-devtools::install_github("fellstat/ShinyAsyncTools")
+devtools::install_github("fellstat/ipc")
 ```
 
 ## Resources
 
 
-* For a more detailed description of what can be done with the ``ShinyAsyncTools`` package, **[see the introductory vignette](http://htmlpreview.github.io/?https://github.com/fellstat/ShinyAsyncTools/blob/master/inst/doc/shinymp.html)**.
+* For a more detailed description of what can be done with the ``ipc`` package, **[see the introductory vignette](http://htmlpreview.github.io/?https://github.com/fellstat/ipc/blob/master/inst/doc/shinymp.html)**.
 
 To run an example application locally use:
 ```
-library(ShinyAsyncTools)
+library(ipc)
 shinyExample()
 ```

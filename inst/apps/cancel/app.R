@@ -1,5 +1,5 @@
 library(shiny)
-library(ShinyAsyncTools)
+library(ipc)
 library(future)
 library(promises)
 plan(multicore)    # This will only work with multicore, which is unavailable on Windows
