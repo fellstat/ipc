@@ -203,7 +203,7 @@ ShinyConsumer <- R6Class(
             msg <- "Triggered Inturrupt"
 
         }
-        stop(msg)
+        stop(msg, call.=FALSE)
       }
       self$addHandler(func, "Interrupt")
     },

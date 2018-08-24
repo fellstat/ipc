@@ -187,7 +187,7 @@ inter <- AsyncInterruptor$new()
 fut <- future({
   accessableAnalysisFunction(progressMonitor = function(i) inter$execInterrupts())
 })
-inter$interrupt("Error: Stop Future")
+inter$interrupt("Stop that future")
 cat(try(value(fut)))
 inter$destroy()
 

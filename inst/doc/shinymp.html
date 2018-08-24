@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ian Fellows" />
 
-<meta name="date" content="2018-08-22" />
+<meta name="date" content="2018-08-24" />
 
 <title>Tools for Inter-Process Communication</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tools for Inter-Process Communication</h1>
 <h4 class="author"><em>Ian Fellows</em></h4>
-<h4 class="date"><em>2018-08-22</em></h4>
+<h4 class="date"><em>2018-08-24</em></h4>
 
 
 
@@ -82,9 +82,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Quick Start</h2>
 <p>Perhaps the most important use of this package is to communicate with a parent thread from a child thread executed using the <code>future</code> package. This is very easy to do. Simply create and start a <code>Queue</code> in the parent thread. The child thread can then send messages and evaluate R code on the main thread.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ipc)
-<span class="kw">library</span>(future)</code></pre></div>
-<pre><code>## Warning: package 'future' was built under R version 3.4.4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan</span>(multiprocess)
+<span class="kw">library</span>(future)
+<span class="kw">plan</span>(multiprocess)
 q &lt;-<span class="st"> </span><span class="kw">queue</span>()
 
 value &lt;-<span class="st"> &quot;&quot;</span>
@@ -108,9 +107,8 @@ q<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <h3>Signaling a child process</h3>
 <p>Signals can also be sent from the main thread to a child. Here we will cause the child process to throw an error.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(future)
-<span class="kw">library</span>(promises)</code></pre></div>
-<pre><code>## Warning: package 'promises' was built under R version 3.4.4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plan</span>(multiprocess)
+<span class="kw">library</span>(promises)
+<span class="kw">plan</span>(multiprocess)
 
 q &lt;-<span class="st"> </span><span class="kw">queue</span>()
 
@@ -287,9 +285,9 @@ inter &lt;-<span class="st"> </span>AsyncInterruptor<span class="op">$</span><sp
 fut &lt;-<span class="st"> </span><span class="kw">future</span>({
   <span class="kw">accessableAnalysisFunction</span>(<span class="dt">progressMonitor =</span> <span class="cf">function</span>(i) inter<span class="op">$</span><span class="kw">execInterrupts</span>())
 })
-inter<span class="op">$</span><span class="kw">interrupt</span>(<span class="st">&quot;Error: Stop Future&quot;</span>)
+inter<span class="op">$</span><span class="kw">interrupt</span>(<span class="st">&quot;Stop that future&quot;</span>)
 <span class="kw">cat</span>(<span class="kw">try</span>(<span class="kw">value</span>(fut)))</code></pre></div>
-<pre><code>## Error in func(signals[i], contents[[i]], env) : unused argument (env)</code></pre>
+<pre><code>## Error : Stop that future</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">inter<span class="op">$</span><span class="kw">destroy</span>()</code></pre></div>
 <p>There are times where the Shiny developer does not have access to the long running code in such a way that <code>execInterrupts</code> can be called as the computation progresses. In these cases, the only way to terminate a running future is to kill it at the OS level.</p>
 <p>The function <code>stopMulticoreFuture</code> kills a future, provided it is executed in a multicore plan. For mac and linux machines, both plan(multiprocess) and plan(multicore) result in multicore execution plans. In windows it is not possible to use a multicore execution plan.</p>
