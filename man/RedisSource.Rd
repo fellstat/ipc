@@ -7,6 +7,8 @@
 \arguments{
 \item{id}{An identifier to use for the queue}
 
+\item{config}{A configuration list for redux::hiredis}
+
 \item{n}{The number of records to pop (-1 indicates all available).}
 
 \item{msg}{A string indicating the signal.}

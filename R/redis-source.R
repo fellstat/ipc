@@ -22,7 +22,7 @@ destroyRedisConnection <- function(id){
 #'
 #'
 #' @param id An identifier to use for the queue
-#' @param redisConfig A configuration list for redux::hiredis
+#' @param config A configuration list for redux::hiredis
 #' @param n The number of records to pop (-1 indicates all available).
 #' @param msg A string indicating the signal.
 #' @param obj The object to associate with the signal.
@@ -39,9 +39,9 @@ RedisSource <- R6Class(
 
   public = list(
 
-    initialize = function(id=redisIdGenerator()(), redisConfig=redisConfig()){
+    initialize = function(id=redisIdGenerator()(), config=redisConfig()){
       private$id <- id
-      private$config <- redisConfig
+      private$config <- config
     },
 
     getRedisConnection = function(){
