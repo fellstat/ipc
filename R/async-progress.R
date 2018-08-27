@@ -123,7 +123,7 @@ AsyncProgress <- R6Class(
     close = function(){
       private$queue$producer$fireEval({
         self$sequentialClose()
-      }, list(args=args))
+      })
     }
   )
 )
