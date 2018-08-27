@@ -18,3 +18,21 @@ defaultSource <- function(sourceClass){
   .globals$defaultSource <- sourceClass
 }
 
+#' Get/set the location for temporary files
+#' @param generator a function generating id strings
+#' @export
+redisIdGenerator <- function(generator){
+  if(missing(generator))
+    return(.globals$redisGenerator)
+  .globals$redisGenerator <- generator
+}
+
+
+#' Get/set redis configuration
+#' @param config a function generating id strings
+#' @export
+redisConfig <- function(config){
+  if(missing(config))
+    return(.globals$redisConfig)
+  .globals$redisConfig <- config
+}

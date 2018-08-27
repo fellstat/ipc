@@ -1,9 +1,16 @@
 library(testthat)
+library(future)
+plan(multisession)
 
+skip_if_no_redis <- function(...) {
+  testthat::skip_on_cran()
+  if (redux::redis_available(...)) {
+    return()
+  }
+  testthat::skip("Redis is not available")
+}
 
-test_that("Main", {
-  q <- TextFileSource$new()
-
+mainTests <- function(q){
   # Test push / pop
   q$push("dsds",list())
   expect_identical(q$pop(-1),
@@ -61,6 +68,39 @@ test_that("Main", {
   cc$consume()
   expect_true(b == 3)
 
+  # Test in Future
+  prod$fireEval(b <- 2)
+  b <- 5
+  f <- future({
+    b <- 4
+    cons$consume()
+    expect_true(b == 2)
+    prod$fireEval(b <- 1)
+    3
+  })
+  v <- value(f)
+  cons$consume()
+  expect_true(b == 1)
+}
+
+test_that("Main Tests With TextFileSource", {
+  q <- TextFileSource$new()
+
+  mainTests(q)
+
+  q$destroy()
+})
+
+test_that("Main Tests With RedisSource", {
+  skip_if_no_redis()
+  q <- RedisSource$new()
+
+  mainTests(q)
+
+  q$destroy()
+})
+
+test_that("File Truncation", {
   # Test file truncation
   tq <- ipc:::.TxTQ$new(tempfile())
   tq$mr(7) #maxRows <- 7
@@ -77,4 +117,9 @@ test_that("Main", {
   tq$pop(-1)
   expect_true(length(readLines(file)) == 0)
 })
+
+
+
+
+
 

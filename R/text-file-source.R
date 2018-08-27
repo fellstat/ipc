@@ -61,7 +61,11 @@ TextFileSource <- R6Class(
 
     q = NULL,
 
-    destroyed = FALSE
+    destroyed = FALSE,
+
+    isDestroyed = function(){
+      private$destroyed || !file.exists(private$file)
+    }
   ),
   public = list(
 
@@ -71,7 +75,7 @@ TextFileSource <- R6Class(
     },
 
     pop = function(n=-1){
-      if(self$isDestroyed())
+      if(private$isDestroyed())
         stop("Cannot pop from destroyed TextFileSource")
       l <- private$q$pop(n)
       result <- list()
@@ -86,7 +90,7 @@ TextFileSource <- R6Class(
     },
 
     push = function(msg, obj){
-      if(self$isDestroyed())
+      if(private$isDestroyed())
         stop("Cannot push to a destroyed TextFileSource")
       s <- objectToString(obj)
       private$q$push(msg, s)
@@ -97,10 +101,6 @@ TextFileSource <- R6Class(
         private$destroyed <- TRUE
         private$q$destroy()
       }
-    },
-
-    isDestroyed = function(){
-      private$destroyed || !file.exists(private$file)
     }
   )
 )
