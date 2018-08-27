@@ -65,7 +65,7 @@ Consumer <- R6Class(
     addfunctionHandler = function(){
       func <- function(signal, obj, env){
         f <- get(obj[[1]], envir = env)
-        do.call(f, obj[[2]])
+        do.call(f, obj[[2]], envir = env)
       }
       self$addHandler(func, "function")
     }
@@ -121,7 +121,7 @@ Consumer <- R6Class(
       result
     },
 
-    start = function(millis=250, throwErrors=TRUE, env=parent.frame()){
+    start = function(millis=250, env=parent.frame()){
       self$stopped <- FALSE
 
       # Needed otherwise env changes every callback
@@ -130,7 +130,7 @@ Consumer <- R6Class(
       callback <- function(){
         if (self$stopped) return()
         tryCatch({
-          result <- self$consume(throwErrors=throwErrors, env=envir)
+          result <- self$consume(throwErrors=FALSE, env=envir)
           if(!is.null(result)){
             for( i in seq_along(result)){
               for(j in seq_along(result[[i]])){

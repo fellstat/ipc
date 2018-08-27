@@ -1,3 +1,4 @@
+context("Main")
 library(testthat)
 library(future)
 plan(multisession)
