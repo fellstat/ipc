@@ -98,6 +98,7 @@ test_that("Main Tests With RedisSource", {
   mainTests(q)
 
   q$destroy()
+  stop("temp check that travis does redis test")
 })
 
 test_that("File Truncation", {
