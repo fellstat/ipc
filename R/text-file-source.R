@@ -82,7 +82,6 @@ TextFileSource <- R6Class(
       if(nrow(l) == 0)
         return(list())
       for(i in 1:nrow(l)){
-        v <- l[i,2]
         result[[i]] <- stringToObject(l[i,2])
         names(result)[i] <- l[i,1]
       }
