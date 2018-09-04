@@ -50,7 +50,7 @@ mainTests <- function(q){
   f <- function(x){
     b <<- abs(x)
   }
-  prod$fireFunction("f", list(x=c(-1,0,1)))
+  prod$fireDoCall("f", list(x=c(-1,0,1)))
   cons$consume()
   expect_equivalent(b, c(1,0,1))
 

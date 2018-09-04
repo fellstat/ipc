@@ -22,6 +22,10 @@ print(value)
 # Remove temporary files
 q$destroy()
 
+## ---- eval=FALSE---------------------------------------------------------
+#  variable <- 2
+#  q$producer$fireEval(val <- j, env=list(j=variable))
+
 ## ----echo=TRUE-----------------------------------------------------------
 library(future)
 library(promises)
@@ -59,6 +63,9 @@ q$destroy()
 #  
 #  # ... Later, stop consumption and clean up
 #  # q$destroy()
+
+## ---- eval=FALSE---------------------------------------------------------
+#  q <- queue(RedisSource$new())
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  library(shiny)

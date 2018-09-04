@@ -67,7 +67,7 @@ Consumer <- R6Class(
         f <- get(obj[[1]], envir = env)
         do.call(f, obj[[2]], envir = env)
       }
-      self$addHandler(func, "function")
+      self$addHandler(func, "doCall")
     }
   ),
   public=list(

@@ -23,9 +23,13 @@
       Signals for execution of the expression \code{obj} with values from
       the environment (or list) \code{env} substituted in.
     }
-    \item{\code{fireFunction(name, param)}}{
-      Signals for execution of the function whose string value is \code{obj}
+    \item{\code{fireDoCall(name, param)}}{
+      Signals for execution of the function whose string value is \code{name}
       with the parameters in list \code{param}.
+    }
+    \item{\code{fireDoCall(name, ...)}}{
+      Signals for execution of the function whose string value is \code{name}
+      with the parameters \code{...}.
     }
  }
 }
@@ -35,6 +39,7 @@
     @param env An environment or list for substitution
     @param param A list of function parameters.
     @param expr An expression to evaluate.
-    @param name the name of the fucntion
+    @param name the name of the function
+    @param ... parameters to be passed to function
 }
 \keyword{datasets}

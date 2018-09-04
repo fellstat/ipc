@@ -15,4 +15,4 @@ Suggests: testthat,
     future,
     promises
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
