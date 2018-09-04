@@ -1,6 +1,6 @@
 # ipc
 
-This package provides tools that let you update a shiny UI from within a child process (e.g. future). Examples are provided showing how to perform useful tasks such as: updating reactive values from within future, progress bars for long running async tasks, and interrupting async tasks based on user input.
+This package provides tools for inter-process communication. There is particular focus on supporting asynchronous evaluation in Shiny applications. Examples are provided showing how to perform useful tasks such as: updating reactive values from within future, progress bars for long running async tasks, and interrupting async tasks based on user input.
 
 ## Installation
 
