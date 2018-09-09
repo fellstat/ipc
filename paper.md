@@ -1,18 +1,19 @@
 ---
-title: 'ipc: An R package for Inter-process Communication'
-tags:
-  - R
-  - High Performance Computing
-  - Interactive Visualization
+title: 'ipc: An R Package for Inter-process Communication'
 authors:
-  - name: Ian E. Fellows
-    orcid: 0000-0003-1261-0925
-    affiliation: "1" # (Multiple affiliations must be quoted)
-affiliations:
- - name: Fellows Statistics
-   index: 1
-date: 4 September 2018
+- affiliation: '1'
+  name: Ian E. Fellows
+  orcid: 0000-0003-1261-0925
+date: "4 September 2018"
+output: pdf_document
 bibliography: paper.bib
+tags:
+- R
+- High Performance Computing
+- Interactive Visualization
+affiliations:
+- index: 1
+  name: Fellows Statistics
 ---
 
 # Summary
