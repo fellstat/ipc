@@ -285,3 +285,6 @@ inter$destroy()
 #  # Run the application
 #  shinyApp(ui = ui, server = server)
 
+## ----echo=FALSE----------------------------------------------------------
+plan(sequential)
+

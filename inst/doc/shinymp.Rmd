@@ -369,6 +369,8 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
-
+```{r echo=FALSE}
+plan(sequential)
+```
 
 
