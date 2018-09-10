@@ -1,10 +1,10 @@
 Package: ipc
 Type: Package
-Title: Tools for message passing between processes
+Title: Tools for Message Passing Between Processes
 Version: 0.1.0
-Author: Ian Fellows
-Maintainer: Ian Fellows <ian@fellstat.com>
-Description: This package provides tools for passing messages between R processes. 
+Author: Ian E. Fellows
+Maintainer: Ian E. Fellows <ian@fellstat.com>
+Description: Provides tools for passing messages between R processes. 
     Shiny Examples are provided showing how to perform useful tasks such as: 
     updating reactive values from within a future, progress bars for long running 
     async tasks, and interrupting async tasks based on user input.
