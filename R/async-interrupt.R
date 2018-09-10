@@ -19,13 +19,13 @@
 #'       Gets the result of the queue's executing, not throwing the interrupts.
 #'     }
 #'   }
-#'
+#' @param queue a shiny queue
 #' @param msg An error message string.
 #'
 #' @examples
 #' library(future)
-#' plan(multiprocess)
-#' library(promises)
+#' strategy <- "future::multisession"
+#' plan(strategy)
 #' inter <- AsyncInterruptor$new()
 #' fut <- future({
 #'   for(i in 1:100){
@@ -33,11 +33,12 @@
 #'     inter$execInterrupts()
 #'   }
 #' })
-#' catch(fut, function(e) print(paste0("From future --- ", e$message)))
-#'
 #' inter$interrupt("Error: Stop Future")
-#' Sys.sleep(.1)
+#' try(value(fut))
 #' inter$destroy()
+#'
+#' # Clean up multisession cluster
+#' plan(sequential)
 #'
 #' @format NULL
 #' @usage NULL

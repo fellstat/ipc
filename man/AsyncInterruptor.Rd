@@ -5,6 +5,8 @@
 \alias{AsyncInterruptor}
 \title{An interruptor useful for stopping child processes.}
 \arguments{
+\item{queue}{a shiny queue}
+
 \item{msg}{An error message string.}
 }
 \description{
@@ -31,8 +33,8 @@ to implement and read.
 }
 \examples{
 library(future)
-plan(multiprocess)
-library(promises)
+strategy <- "future::multisession"
+plan(strategy)
 inter <- AsyncInterruptor$new()
 fut <- future({
   for(i in 1:100){
@@ -40,11 +42,12 @@ fut <- future({
     inter$execInterrupts()
   }
 })
-catch(fut, function(e) print(paste0("From future --- ", e$message)))
-
 inter$interrupt("Error: Stop Future")
-Sys.sleep(.1)
+try(value(fut))
 inter$destroy()
+
+# Clean up multisession cluster
+plan(sequential)
 
 }
 \keyword{datasets}
