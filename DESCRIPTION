@@ -1,14 +1,14 @@
 Package: ipc
 Type: Package
 Title: Tools for Message Passing Between Processes
-Version: 0.1.0
+Version: 0.1.1
 Author: Ian E. Fellows
 Maintainer: Ian E. Fellows <ian@fellstat.com>
 Description: Provides tools for passing messages between R processes. 
     Shiny Examples are provided showing how to perform useful tasks such as: 
     updating reactive values from within a future, progress bars for long running 
     async tasks, and interrupting async tasks based on user input.
-Imports: R6, shiny, txtq, redux
+Imports: R6, shiny, txtq
 License:  MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,6 +16,7 @@ Suggests: testthat,
     knitr,
     rmarkdown,
     future,
-    promises
+    promises,
+    redux
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0

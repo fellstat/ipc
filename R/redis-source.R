@@ -40,6 +40,10 @@ RedisSource <- R6Class(
   public = list(
 
     initialize = function(id=redisIdGenerator()(), config=redisConfig()){
+      if (!requireNamespace("redux", quietly = TRUE)) {
+        stop("Package \"redux\" needed for RedisSource to work. Please install it.",
+             call. = FALSE)
+      }
       private$id <- id
       private$config <- config
     },
