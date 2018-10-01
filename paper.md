@@ -38,7 +38,7 @@ q$consumer$consume()
 
 This package can be applied to high performance computing environments, easily allowing parallel worker processes to communicate partial results or progress to the main thread. Another major use case is to support asynchronous web based user interfaces ([@shiny]) to long running statistical algorithms.
 
-## Use in Shiny
+### Use in Shiny
 
 When building a Shiny interface that involves long running processes, there are two major considerations that need to be addressed:
 
