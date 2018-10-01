@@ -34,3 +34,8 @@ To run an example application locally use:
 library(ipc)
 shinyExample()
 ```
+
+
+## Development
+
+[Development Practices and Policies for Contributers](../../wiki/How-to-Contribute:-Git-Practices)
