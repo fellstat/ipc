@@ -9,7 +9,7 @@ Description: Provides tools for passing messages between R processes.
     updating reactive values from within a future, progress bars for long running 
     async tasks, and interrupting async tasks based on user input.
 Imports: R6, shiny, txtq
-License:  MIT + file LICENSE
+License:  MIT + file LICENCE
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat,

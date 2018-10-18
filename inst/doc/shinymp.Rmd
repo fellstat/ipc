@@ -11,7 +11,7 @@ vignette: >
 
 ## Introduction
 
-ipc provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.
+`ipc` provides methods for inter-process communication useful when developing Shiny applications that use asynchronous processing.
 
 ## Quick Start
 
@@ -373,4 +373,54 @@ shinyApp(ui = ui, server = server)
 plan(sequential)
 ```
 
+## Use in HPC Environments
+
+Shiny apps are not the only place where it is desirable to monitor computationally complex tasks. Packages like `ergm` and `rstan` use parallel computing when performing MCMC simulations. `ipc` can be used to report back intermediate results and progress to the user. Here is a function that does parallel (fake) MCMC, and provides both a progress bar and running trace plots for the chains.
+
+```
+library(parallel)
+
+
+mcmcTask <- function(){
+  on.exit(q$destroy())
+  nchains <- min(4, detectCores() - 1)
+  q <- queue()
+  prog <- 1
+  pb <- txtProgressBar(min = 0, max = nchains * 10, style=3)
+  res <- list()
+  chains <- list()
+  for(i in 1:nchains){
+    # Run each chain in parallel
+    res[[i]] <- mcparallel({
+      chain <- c()
+      for(j in 1:10){
+        chain <- c(chain, rnorm(100))
+        
+        # Send the current chain to the main thread
+        q$producer$fireEval(chains[[i]] <- chain, list(i=i,chain=chain))
+        # Update progress
+        q$producer$fireEval(prog <- prog + 1)
+        
+        Sys.sleep(runif(1)*5)
+      }
+      chain
+    })
+  }
+  
+  # Monitor progress
+  while(prog < nchains * 10){
+    q$consumer$consume()
+    setTxtProgressBar(pb, prog)
+    par(mfrow=c(2,ceiling(nchains / 2)))
+    for(j in seq_along(chains)) 
+      if(length(chains[[j]]) > 1) 
+        plot(chains[[j]], main=paste("Trace Plot for MCMC chain", j))
+    Sys.sleep(2)
+  }
+  close(pb)
+  mccollect(res)
+}
+
+chains <- mcmcTask()
+```
 
