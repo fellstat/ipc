@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ian Fellows" />
 
-<meta name="date" content="2018-10-18" />
+<meta name="date" content="2018-10-26" />
 
 <title>Tools for Inter-Process Communication</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tools for Inter-Process Communication</h1>
 <h4 class="author"><em>Ian Fellows</em></h4>
-<h4 class="date"><em>2018-10-18</em></h4>
+<h4 class="date"><em>2018-10-26</em></h4>
 
 
 
@@ -224,6 +224,7 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
 <span class="kw">library</span>(ipc)
 <span class="kw">library</span>(future)
+<span class="kw">library</span>(promises)
 <span class="kw">plan</span>(multiprocess)
 
 ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(

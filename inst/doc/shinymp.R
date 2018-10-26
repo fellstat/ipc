@@ -124,6 +124,7 @@ q$destroy()
 #  library(shiny)
 #  library(ipc)
 #  library(future)
+#  library(promises)
 #  plan(multiprocess)
 #  
 #  ui <- fluidPage(
