@@ -9,7 +9,7 @@ There is particular focus on supporting asynchronous evaluation in Shiny applica
 * Interrupting async tasks based on user input.
 
 ## Installation
-To install the latest version from [CRAN](https://cran.r-project.org/web/packages/ipc/index.html)
+To install the latest version from [CRAN](https://CRAN.R-project.org/package=ipc)
 run:
 ```
 install.packages("ipc")
