@@ -3,5 +3,6 @@
 #' @name ipc-package
 #' @author Ian Fellows \email{ian@fellstat.com}
 #' @importFrom R6 R6Class
+#' @import txtq
 NULL
 
