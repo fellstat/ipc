@@ -129,6 +129,7 @@ Consumer <- R6Class(
 
       callback <- function(){
         if (self$stopped) return()
+        on.exit(self$laterHandle <- later::later(callback, millis / 1000))
         tryCatch({
           result <- self$consume(throwErrors=FALSE, env=envir)
           if(!is.null(result)){
@@ -141,7 +142,7 @@ Consumer <- R6Class(
             }
           }
         })
-        self$laterHandle <- later::later(callback, millis / 1000)
+
       }
       callback()
     },
