@@ -1,8 +1,8 @@
 objectToString <- function(obj){
-  on.exit(close(con))
-  con <- textConnection(NULL,"w")
-  saveRDS(obj, con, ascii = TRUE)
-  paste0(textConnectionValue(con), collapse="\n")
+  tf <- tempfile()
+  on.exit(unlink(tf))
+  saveRDS(obj, tf, ascii = TRUE)
+  paste0(readLines(tf), collapse="\n")
 }
 
 stringToObject <- function(strg){
