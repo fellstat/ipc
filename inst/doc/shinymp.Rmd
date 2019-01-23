@@ -15,7 +15,7 @@ vignette: >
 
 ## Quick Start
 
-Perhaps the most important use of this package is to communicate with a parent thread from a child thread executed using the `future` package. This is very easy to do. Simply create and start a `Queue` in the parent thread. The child thread can then send messages and evaluate R code on the main thread.
+Perhaps the most important use of this package is to communicate with a parent process from a child process executed using the `future` package. This is very easy to do. Simply create and start a `Queue` in the parent process. The child process can then send messages and evaluate R code on the main process.
 
 ```{R echo=TRUE}
 library(ipc)
@@ -26,7 +26,7 @@ q <- queue()
 value <- ""
 
 f <- future({
-  # set value in the main thread
+  # set value in the main process
   q$producer$fireEval({
     value <- "Hello world"
   })
@@ -58,7 +58,7 @@ q$producer$fireEval(val <- j, env=list(j=variable))
 
 ### Signaling a child process
 
-Signals can also be sent from the main thread to a child. Here we will cause the child process to throw an error.
+Signals can also be sent from the main process to a child. Here we will cause the child process to throw an error.
 
 ```{R echo=TRUE}
 library(future)
@@ -125,7 +125,7 @@ In Shiny apps, it is recommended that queues be created with the `shinyQueue` fu
 
 ### Changing a reactive value from a future
 
-Reactive values can not be changed directly from within a future. Queues make it easy to signal the main thread to assign a reactive value from within the body of a future.
+Reactive values can not be changed directly from within a future. Queues make it easy to signal the main process to assign a reactive value from within the body of a future.
 
 The application below creates a future every time countdown is clicked, which assigns a value to the reactive value every second, counting down from 10 to 0. If you click the button multiple times, each future will compete to set the value, and the numbers will jump around.
 
@@ -397,7 +397,7 @@ mcmcTask <- function(){
       for(j in 1:10){
         chain <- c(chain, rnorm(100))
         
-        # Send the current chain to the main thread
+        # Send the current chain to the main process
         q$producer$fireEval(chains[[i]] <- chain, list(i=i,chain=chain))
         # Update progress
         q$producer$fireEval(prog <- prog + 1)
