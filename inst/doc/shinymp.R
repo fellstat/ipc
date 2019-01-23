@@ -7,7 +7,7 @@ q <- queue()
 value <- ""
 
 f <- future({
-  # set value in the main thread
+  # set value in the main process
   q$producer$fireEval({
     value <- "Hello world"
   })

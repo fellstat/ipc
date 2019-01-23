@@ -11,7 +11,7 @@ Description: Provides tools for passing messages between R processes.
 URL: https://github.com/fellstat/ipc
 BugReports: https://github.com/fellstat/ipc/issues
 Imports: R6, shiny, txtq
-License:  MIT + file LICENCE
+License: MIT + file LICENCE
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat,
@@ -21,4 +21,4 @@ Suggests: testthat,
     promises,
     redux
 VignetteBuilder: knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

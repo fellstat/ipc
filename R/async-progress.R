@@ -2,7 +2,7 @@
 #' A progress bar object where inc and set are usable within other processes
 #'
 #' An async compatible wrapper around Shiny's progress bar. It should be instatiated
-#' from the main thread, but may be closed, set and incremented from any thread.
+#' from the main process, but may be closed, set and incremented from any process.
 #'
 #' \strong{Methods}
 #'   \describe{
@@ -19,10 +19,10 @@
 #'       of setting it to a specific value.
 #'     }
 #'     \item{\code{sequentialClose()}}{
-#'       Removes the progress panel and destroys the queue. Must be called from main thread.
+#'       Removes the progress panel and destroys the queue. Must be called from main process.
 #'     }
 #'     \item{\code{close()}}{
-#'       Fires a close signal and may be used from any thread.
+#'       Fires a close signal and may be used from any process.
 #'     }
 #'   }
 #'
