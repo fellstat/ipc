@@ -75,11 +75,12 @@ mainTests <- function(q){
   f <- future({
     b <- 4
     cons$consume()
-    expect_true(b == 2)
+    c <- b
     prod$fireEval(b <- 1)
-    3
+    c
   })
   v <- value(f)
+  expect_true(v == 2)
   cons$consume()
   expect_true(b == 1)
 }
