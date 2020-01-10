@@ -30,10 +30,14 @@ Queue <- R6Class(
 )
 
 #' Create a Queue object
+#' @description Creates a Queue object for inter-process communication.
+#' Its members \code{producer} and \code{consumer} are the main entry points for
+#' sending and receiving messages respectively.
 #' @param source The source for reading and writing the queue
 #' @param producer The producer for the source
 #' @param consumer The consumer of the source
 #' @aliases Queue
+#' @details 
 #' @export
 queue  <- function(source = defaultSource()$new(),
                         producer = Producer$new(source),
