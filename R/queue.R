@@ -30,14 +30,21 @@ Queue <- R6Class(
 )
 
 #' Create a Queue object
+#' @aliases Queue
+#' @rdname Queue
 #' @description Creates a Queue object for inter-process communication.
 #' Its members \code{producer} and \code{consumer} are the main entry points for
 #' sending and receiving messages respectively.
 #' @param source The source for reading and writing the queue
 #' @param producer The producer for the source
 #' @param consumer The consumer of the source
-#' @aliases Queue
-#' @details 
+#' @details
+#' This function creates a queue object for communication between different R processes,
+#' including forks of the same process.  It uses \code{txtq} backage as its backend.
+#' Technically, the information is sent through temporary files, created in a new directory
+#' inside the session-specific temporary folder (see \code{\link{tempfile}}).
+#' This requires that the new directory is writeable, this is normally the case but
+#' if \code{\link{Sys.umask}} forbids writing, the communication fails with an error.
 #' @export
 queue  <- function(source = defaultSource()$new(),
                         producer = Producer$new(source),
@@ -53,7 +60,7 @@ queue  <- function(source = defaultSource()$new(),
 #' @param session A Shiny session
 #' @details
 #' Creates a Queue object for use with shiny, backed by
-#' ShinyTextSource, ShiyProducer and ShinyConsumer objects
+#' ShinyTextSource, ShinyProducer and ShinyConsumer objects
 #' by default. The object will be cleaned up and destroyed on
 #' session end.
 #' @export

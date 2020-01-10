@@ -3,7 +3,7 @@ Type: Package
 Title: Tools for Message Passing Between Processes
 Version: 0.1.3
 Author: Ian E. Fellows
-Maintainer: Ian E. Fellows <ian@fellstat.com>
+Maintainer: Ian E. Fellows <otoomet@gmail.com>
 Description: Provides tools for passing messages between R processes. 
     Shiny Examples are provided showing how to perform useful tasks such as: 
     updating reactive values from within a future, progress bars for long running 
@@ -21,4 +21,4 @@ Suggests: testthat,
     promises,
     redux
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
