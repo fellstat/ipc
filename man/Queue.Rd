@@ -25,8 +25,8 @@ sending and receiving messages respectively.
 }
 \details{
 This function creates a queue object for communication between different R processes,
-including forks of the same process.  It uses \code{txtq} backage as it's backend.
-Technically, the information is sent using temporary files, created in a new directory
+including forks of the same process.  By default, it uses \code{txtq} backage as its backend.
+Technically, the information is sent through temporary files, created in a new directory
 inside the session-specific temporary folder (see \code{\link{tempfile}}).
 This requires that the new directory is writeable, this is normally the case but
 if \code{\link{Sys.umask}} forbids writing, the communication fails with an error.
