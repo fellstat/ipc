@@ -19,4 +19,6 @@ recommended for cases where you can listen for interrupts within the future
 (with \code{AsyncInterruptor}). However, for cases where long running code is
 in an external library for which you don't have control, this can be the only way
 to terminate the execution.
+
+Note that multicore is not supported on Windows machines or within RStudio.
 }

@@ -90,6 +90,8 @@ AsyncInterruptor <- R6Class(
 #' (with \code{AsyncInterruptor}). However, for cases where long running code is
 #' in an external library for which you don't have control, this can be the only way
 #' to terminate the execution.
+#'
+#' Note that multicore is not supported on Windows machines or within RStudio.
 #' @export
 stopMulticoreFuture <- function(x){
   if(!inherits(x,"MulticoreFuture")){
