@@ -2,7 +2,7 @@
 
 Asynchronous processing is critical for performing a wide array of tasks, from high performance computing to web services. Communication between these disparate asynchronous processes is often required. Currently the statistical computing language R provides no built in features to handle interprocess communication between R processes while they are performing computations. Several packages have been written to handle the passing of text or binary data between processes (e.g. `txtq`, `liteq`, and `zmq`). `ipc` allows you to easily pass R objects between processes along with an associated signal, and have handler functions automatically execute them in the receiving process.
 
-There is particular focus on supporting asynchronous evaluation in Shiny applications. Examples are provided showing how to perform useful tasks such as:
+There is particular focus on supporting asynchronous evaluation in Shiny applications. [Examples are included in the package](https://github.com/fellstat/ipc/tree/master/inst/apps) showing how to perform useful tasks such as:
 
 * Updating reactive values from within future
 * Progress bars for long running async tasks
