@@ -39,6 +39,9 @@ RedisSource <- R6Class(
 
   public = list(
 
+    #' @description Creates a redis source object.
+    #' @param id An identifier to use for the queue
+    #' @param config A configuration list for redux::hiredis
     initialize = function(id=redisIdGenerator()(), config=redisConfig()){
       if (!requireNamespace("redux", quietly = TRUE)) {
         stop("Package \"redux\" needed for RedisSource to work. Please install it.",
@@ -48,6 +51,7 @@ RedisSource <- R6Class(
       private$config <- config
     },
 
+    #' @description Returns the underlying redis connection.
     getRedisConnection = function(){
       con <- redisConnection(private$id)
       if(is.null(con)){
@@ -57,6 +61,8 @@ RedisSource <- R6Class(
       con
     },
 
+    #' @description removes n items from the source and returns them
+    #' @param n The number of records to pop (-1 indicates all available).
     pop = function(n=-1){
       if(n == 0)
         return(list())
@@ -85,18 +91,23 @@ RedisSource <- R6Class(
       result
     },
 
+    #' @description Adds an item to the source.
+    #' @param msg A string indicating the signal.
+    #' @param obj The object to associate with the signal.
     push = function(msg, obj){
       s <- objectToString(list(msg=msg,obj=obj))
       con <- self$getRedisConnection()
       con$LPUSH(private$id, s)
     },
 
+    #' @description Cleans up source after use.
     destroy = function(){
       con <- self$getRedisConnection()
       con$DEL(private$id)
       setRedisConnection(private$id, NULL)
     },
 
+    #' @description finalize
     finalize = function() {
       setRedisConnection(private$id, NULL)
     }

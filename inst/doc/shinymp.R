@@ -1,7 +1,7 @@
-## ----echo=TRUE-----------------------------------------------------------
+## ----echo=TRUE----------------------------------------------------------------
 library(ipc)
 library(future)
-plan(multiprocess)
+plan(multisession)
 q <- queue()
 
 value <- ""
@@ -22,14 +22,14 @@ print(value)
 # Remove temporary files
 q$destroy()
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  variable <- 2
 #  q$producer$fireEval(val <- j, env=list(j=variable))
 
-## ----echo=TRUE-----------------------------------------------------------
+## ----echo=TRUE----------------------------------------------------------------
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 q <- queue()
 
@@ -45,10 +45,10 @@ cat(try(value(fut)))
 
 q$destroy()
 
-## ----eval=FALSE----------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  library(future)
 #  library(promises)
-#  plan(multiprocess)
+#  plan(multisession)
 #  
 #  q <- queue()
 #  
@@ -64,14 +64,14 @@ q$destroy()
 #  # ... Later, stop consumption and clean up
 #  # q$destroy()
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  q <- queue(RedisSource$new())
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  library(shiny)
 #  library(ipc)
 #  library(future)
-#  plan(multiprocess)
+#  plan(multisession)
 #  
 #  ui <- fluidPage(
 #  
@@ -120,12 +120,12 @@ q$destroy()
 #  # Run the application
 #  shinyApp(ui = ui, server = server)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  library(shiny)
 #  library(ipc)
 #  library(future)
 #  library(promises)
-#  plan(multiprocess)
+#  plan(multisession)
 #  
 #  ui <- fluidPage(
 #  
@@ -175,10 +175,10 @@ q$destroy()
 #  # Run the application
 #  shinyApp(ui = ui, server = server)
 
-## ----echo=TRUE-----------------------------------------------------------
+## ----echo=TRUE----------------------------------------------------------------
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 # A long running function. Having a callback (progressMonitor) is a way to
 # allow for interrupts to be checked for without adding a dependency
@@ -199,7 +199,7 @@ inter$interrupt("Stop that future")
 cat(try(value(fut)))
 inter$destroy()
 
-## ----eval=FALSE----------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  library(shiny)
 #  library(ipc)
 #  library(future)
@@ -286,6 +286,6 @@ inter$destroy()
 #  # Run the application
 #  shinyApp(ui = ui, server = server)
 
-## ----echo=FALSE----------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 plan(sequential)
 

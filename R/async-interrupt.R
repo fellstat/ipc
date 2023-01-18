@@ -49,22 +49,29 @@ AsyncInterruptor <- R6Class(
     queue=NULL
   ),
   public = list(
+    #' @description Create the object
+    #' @param queue The underlying queue object to use for interruption
     initialize = function(queue=shinyQueue()){
       private$queue <- queue
     },
 
+    #' @description signal an error
+    #' @param msg The error message
     interrupt = function(msg="Signaled Interrupt"){
       private$queue$producer$fireInterrupt(msg)
     },
 
+    #' @description Execute any interruptions that have been signaled
     execInterrupts = function(){
       private$queue$consumer$consume()
     },
 
+    #' @description Get any interruptions that have been signaled without throwing them as errors
     getInterrupts = function(){
       private$queue$consumer$consume(throwErrors=FALSE)
     },
 
+    #' @description Cleans up object after use
     destroy = function(){
       private$queue$destroy()
     }

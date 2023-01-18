@@ -69,11 +69,15 @@ TextFileSource <- R6Class(
   ),
   public = list(
 
+    #' @description Creates a TextFileSource
+    #' @param filePath The path to the file.
     initialize = function(filePath=tempFileGenerator()()){
       private$file <- filePath
       private$q <- .TxTQ$new(private$file)
     },
 
+    #' @description removes n items from the source and returns them
+    #' @param n The number of records to pop (-1 indicates all available).
     pop = function(n=-1){
       if(private$isDestroyed())
         stop("Cannot pop from destroyed TextFileSource")
@@ -88,6 +92,9 @@ TextFileSource <- R6Class(
       result
     },
 
+    #' @description Adds an item to the source.
+    #' @param msg A string indicating the signal.
+    #' @param obj The object to associate with the signal.
     push = function(msg, obj){
       if(private$isDestroyed())
         stop("Cannot push to a destroyed TextFileSource")
@@ -95,6 +102,7 @@ TextFileSource <- R6Class(
       private$q$push(msg, s)
     },
 
+    #' @description Cleans up source after use.
     destroy = function(){
       if(!private$destroyed){
         private$destroyed <- TRUE

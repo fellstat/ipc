@@ -1,7 +1,7 @@
 Package: ipc
 Type: Package
 Title: Tools for Message Passing Between Processes
-Version: 0.1.3
+Version: 0.1.4
 Author: Ian E. Fellows
 Maintainer: Ian E. Fellows <ian@fellstat.com>
 Description: Provides tools for passing messages between R processes. 
@@ -21,4 +21,4 @@ Suggests: testthat,
     promises,
     redux
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.2.2

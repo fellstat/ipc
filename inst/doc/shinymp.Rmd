@@ -20,7 +20,7 @@ Perhaps the most important use of this package is to communicate with a parent p
 ```{R echo=TRUE}
 library(ipc)
 library(future)
-plan(multiprocess)
+plan(multisession)
 q <- queue()
 
 value <- ""
@@ -63,7 +63,7 @@ Signals can also be sent from the main process to a child. Here we will cause th
 ```{R echo=TRUE}
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 q <- queue()
 
@@ -89,7 +89,7 @@ A consumer's `start` method can be used to execute `comsume` at regular interval
 ```{r eval=FALSE}
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 q <- queue()
 
@@ -133,7 +133,7 @@ The application below creates a future every time countdown is clicked, which as
 library(shiny)
 library(ipc)
 library(future)
-plan(multiprocess)
+plan(multisession)
 
 ui <- fluidPage(
 
@@ -193,7 +193,7 @@ library(shiny)
 library(ipc)
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 ui <- fluidPage(
 
@@ -252,7 +252,7 @@ When creating a UI with a process that take a significant amount of times it is 
 ```{R echo=TRUE}
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 # A long running function. Having a callback (progressMonitor) is a way to
 # allow for interrupts to be checked for without adding a dependency
@@ -277,7 +277,7 @@ inter$destroy()
 
 There are times where the Shiny developer does not have access to the long running code in such a way that `execInterrupts` can be called as the computation progresses. In these cases, the only way to terminate a running future is to kill it at the OS level.
 
-The function `stopMulticoreFuture` kills a future, provided it is executed in a multicore plan. For mac and linux machines, both plan(multiprocess) and plan(multicore) result in multicore execution plans. In windows it is not possible to use a multicore execution plan.
+The function `stopMulticoreFuture` kills a future, provided it is executed in a multicore plan. For mac and linux machines, plan(multicore) results in a multicore execution plans. In windows it is not possible to use a multicore execution plan.
 
 The behavior of the execution plan after a kill signal has been sent is technically undefined, but currently there are no large unintended consequences of killing child processes. This may change in the future however, which is why `AsyncInterruptor` is strongly preferred if at all possible.
 

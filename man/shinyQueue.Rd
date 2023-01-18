@@ -4,10 +4,12 @@
 \alias{shinyQueue}
 \title{Create a Queue object}
 \usage{
-shinyQueue(source = defaultSource()$new(),
+shinyQueue(
+  source = defaultSource()$new(),
   producer = ShinyProducer$new(source),
   consumer = ShinyConsumer$new(source),
-  session = shiny::getDefaultReactiveDomain())
+  session = shiny::getDefaultReactiveDomain()
+)
 }
 \arguments{
 \item{source}{The source for reading and writing the queue}

@@ -5,7 +5,8 @@
 \alias{ipc-package}
 \title{Tools for performing async communication between workers in shiny}
 \description{
-Tools for performing async communication between workers in shiny
+Provides tools for passing messages between R processes. Shiny Examples are provided showing how to perform useful tasks such as:
+updating reactive values from within a future, progress bars for long running async tasks, and interrupting async tasks based on user input.
 }
 \author{
 Ian Fellows \email{ian@fellstat.com}

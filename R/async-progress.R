@@ -4,45 +4,6 @@
 #' An async compatible wrapper around Shiny's progress bar. It should be instatiated
 #' from the main process, but may be closed, set and incremented from any process.
 #'
-#' \strong{Methods}
-#'   \describe{
-#'     \item{\code{initialize(..., queue=shinyQueue(), millis=250, value=NULL, message=NULL, detail=NULL)}}{
-#'       Creates a new progress panel and displays it.
-#'     }
-#'     \item{\code{set(value = NULL, message = NULL, detail = NULL)}}{
-#'       Updates the progress panel. When called the first time, the
-#'       progress panel is displayed.
-#'     }
-#'     \item{\code{inc(amount = 0.1, message = NULL, detail = NULL)}}{
-#'       Like \code{set}, this updates the progress panel. The difference is
-#'       that \code{inc} increases the progress bar by \code{amount}, instead
-#'       of setting it to a specific value.
-#'     }
-#'     \item{\code{sequentialClose()}}{
-#'       Removes the progress panel and destroys the queue. Must be called from main process.
-#'     }
-#'     \item{\code{close()}}{
-#'       Fires a close signal and may be used from any process.
-#'     }
-#'   }
-#'
-#' @param session The Shiny session object, as provided by
-#'   \code{shinyServer} to the server function.
-#' @param min The value that represents the starting point of the
-#'   progress bar. Must be less tham \code{max}.
-#' @param max The value that represents the end of the progress bar.
-#'   Must be greater than \code{min}.
-#' @param message A single-element character vector; the message to be
-#'   displayed to the user, or \code{NULL} to hide the current message
-#'   (if any).
-#' @param detail A single-element character vector; the detail message
-#'   to be displayed to the user, or \code{NULL} to hide the current
-#'   detail message (if any). The detail message will be shown with a
-#'   de-emphasized appearance relative to \code{message}.
-#' @param value A numeric value at which to set
-#'   the progress bar, relative to \code{min} and \code{max}.
-#' @param queue A Queue object for message passing
-#' @param millis How often in milliseconds should updates to the progress bar be checked for.
 #' @examples
 #' ## Only run examples in interactive R sessions
 #' if (interactive()) {
@@ -87,6 +48,20 @@ AsyncProgress <- R6Class(
     progress=NULL
   ),
   public = list(
+
+    #' @description Creates a new progress panel and displays it.
+    #' @param ... Additional parameters to be passed to Shiny::Progress
+    #' @param queue A Queue object for message passing
+    #' @param millis  How often in milliseconds should updates to the progress bar be checked for.
+    #' @param value A numeric value at which to set
+    #' the progress bar, relative to \code{min} and \code{max}.
+    #' @param message A single-element character vector; the message to be
+    #'   displayed to the user, or \code{NULL} to hide the current message
+    #'   (if any).
+    #' @param detail A single-element character vector; the detail message
+    #'   to be displayed to the user, or \code{NULL} to hide the current
+    #'   detail message (if any). The detail message will be shown with a
+    #'   de-emphasized appearance relative to \code{message}.
     initialize = function(..., queue=shinyQueue(), millis=250, value=NULL, message=NULL, detail=NULL){
       private$queue <- queue
       private$progress <- Progress$new(...)
@@ -95,10 +70,13 @@ AsyncProgress <- R6Class(
       private$queue$consumer$start(millis)
     },
 
+    #' @description Returns the maximum
     getMax = function() private$progress$getMax(),
 
+    #' @description Returns the minimum
     getMin = function() private$progress$getMin(),
 
+    #' @description  Removes the progress panel and destroys the queue. Must be called from main process.
     sequentialClose = function(){
       private$queue$destroy()
       private$progress$close()
@@ -106,6 +84,16 @@ AsyncProgress <- R6Class(
       private$progress <- NULL
     },
 
+    #' @description Updates the progress panel. When called the first time, the
+    #'       progress panel is displayed.
+    #' @param value A numeric value at which to set
+    #' @param message A single-element character vector; the message to be
+    #'   displayed to the user, or \code{NULL} to hide the current message
+    #'   (if any).
+    #' @param detail A single-element character vector; the detail message
+    #'   to be displayed to the user, or \code{NULL} to hide the current
+    #'   detail message (if any). The detail message will be shown with a
+    #'   de-emphasized appearance relative to \code{message}.
     set = function(value = NULL, message = NULL, detail = NULL){
       args <- list(value = value, message = message, detail = detail)
       private$queue$producer$fireEval({
@@ -113,6 +101,17 @@ AsyncProgress <- R6Class(
       }, list(args=args))
     },
 
+    #' @description Like \code{set}, this updates the progress panel. The difference is
+    #'       that \code{inc} increases the progress bar by \code{amount}, instead
+    #'       of setting it to a specific value.
+    #' @param amount the size of the increment.
+    #' @param message A single-element character vector; the message to be
+    #'   displayed to the user, or \code{NULL} to hide the current message
+    #'   (if any).
+    #' @param detail A single-element character vector; the detail message
+    #'   to be displayed to the user, or \code{NULL} to hide the current
+    #'   detail message (if any). The detail message will be shown with a
+    #'   de-emphasized appearance relative to \code{message}.
     inc = function(amount = 0.1, message = NULL, detail = NULL){
       args <- list(amount = amount, message = message, detail = detail)
       private$queue$producer$fireEval({
@@ -120,6 +119,7 @@ AsyncProgress <- R6Class(
       }, list(args=args))
     },
 
+    #' @description Fires a close signal and may be used from any process.
     close = function(){
       private$queue$producer$fireEval({
         self$sequentialClose()
