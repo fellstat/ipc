@@ -9,7 +9,7 @@
 #' if (interactive()) {
 #' library(shiny)
 #' library(future)
-#' plan(multiprocess)
+#' plan(multisession)
 #' ui <- fluidPage(
 #'   actionButton("run","Run"),
 #'   tableOutput("dataset")
@@ -28,7 +28,7 @@
 #'       progress$close()
 #'       cars
 #'     }) %...>% dat
-#'     NULL
+#'     NULL #return something other than the future so the UI is not blocked
 #'   })
 #'
 #'   output$dataset <- renderTable({

@@ -2,7 +2,7 @@ library(shiny)
 library(ipc)
 library(future)
 library(promises)
-plan(multiprocess)
+plan(multisession)
 
 
 # Define UI for application that draws a histogram

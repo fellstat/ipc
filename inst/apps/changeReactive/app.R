@@ -1,7 +1,7 @@
 library(shiny)
 library(ipc)
 library(future)
-plan(multiprocess)
+plan(multisession)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
