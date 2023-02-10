@@ -1,7 +1,7 @@
 Package: ipc
 Type: Package
 Title: Tools for Message Passing Between Processes
-Version: 0.1.4
+Version: 0.1.5
 Author: Ian E. Fellows
 Maintainer: Ian E. Fellows <ian@fellstat.com>
 Description: Provides tools for passing messages between R processes. 
